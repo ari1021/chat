@@ -18,7 +18,6 @@
 ├── docker-compose.yaml
 ├── go.mod
 ├── go.sum
-├── main
 ├── main.go
 ├── model  // structだけが書かれたファイル
 ├── server
