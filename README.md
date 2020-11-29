@@ -2,9 +2,10 @@
 
 ## 使い方
 
+サーバーの起動方法
+
 1. docker-compose build
 1. docker-compose up
-1. ブラウザで localhost:8080 を開く
 
 ## ディレクトリ構成
 
