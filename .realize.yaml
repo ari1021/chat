@@ -5,7 +5,13 @@ settings:
 schema:
   - name: src
     path: .
-    commands: {}
+    commands:
+      build:
+        status: true
+        method: go build -o main
+      run:
+        status: true
+        method: ./main
     watcher:
       extensions:
         - go
