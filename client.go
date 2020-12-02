@@ -55,22 +55,22 @@ type Client struct {
 // reads from this goroutine.
 func (c *Client) readPump() {
 	defer func() {
-		c.hub.unregister <- c
-		c.conn.Close()
+		c.hub.unregister <- c //Hubからunregisterして
+		c.conn.Close()        //connectionをcloseする
 	}()
 	c.conn.SetReadLimit(maxMessageSize)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil }) //何かあればReadDeadlineを延長する
 	for {
-		_, message, err := c.conn.ReadMessage()
+		_, message, err := c.conn.ReadMessage() //clientがmessageを送れば，c.conn.ReadMessage()でmessageが受け取れる
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
 			}
 			break
 		}
-		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.hub.broadcast <- message
+		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1)) //messageの改行をスペースに変える
+		c.hub.broadcast <- message                                            //Hubに送る
 	}
 }
 
@@ -82,13 +82,13 @@ func (c *Client) readPump() {
 func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
-		ticker.Stop()
-		c.conn.Close()
+		ticker.Stop()  //tickerを止めて
+		c.conn.Close() //connectionをcloseする
 	}()
 	for {
 		select {
-		case message, ok := <-c.send:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+		case message, ok := <-c.send: //messageが送られてきたら，c.sendからmessageを取り出せる
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait)) //WriteDeadlineを延長する
 			if !ok {
 				// The hub closed the channel.
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
@@ -103,7 +103,7 @@ func (c *Client) writePump() {
 
 			// Add queued chat messages to the current websocket message.
 			n := len(c.send)
-			for i := 0; i < n; i++ {
+			for i := 0; i < n; i++ { //さらにc.sendにデータがあればそれも送る
 				w.Write(newline)
 				w.Write(<-c.send)
 			}
@@ -127,8 +127,8 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
-	client.hub.register <- client
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)} //clietを作成して
+	client.hub.register <- client                                         //Hubにregisterする
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.

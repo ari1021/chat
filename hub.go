@@ -8,7 +8,7 @@ package websocket
 // clients.
 type Hub struct {
 	// Registered clients.
-	clients map[*Client]bool
+	clients map[*Client]bool //Clientのpointerがkeyでvalueがbool
 
 	// Inbound messages from the clients.
 	broadcast chan []byte
@@ -20,7 +20,7 @@ type Hub struct {
 	unregister chan *Client
 }
 
-func newHub() *Hub {
+func newHub() *Hub { //新たにHubを作ってそのpointerを返す
 	return &Hub{
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
@@ -32,20 +32,20 @@ func newHub() *Hub {
 func (h *Hub) run() {
 	for {
 		select {
-		case client := <-h.register:
-			h.clients[client] = true
-		case client := <-h.unregister:
-			if _, ok := h.clients[client]; ok {
-				delete(h.clients, client)
-				close(client.send)
+		case client := <-h.register: //Hubのregisterというchannelに*Clientが入っているとき
+			h.clients[client] = true //clientを登録する
+		case client := <-h.unregister: //Hubのunregisterというchannelに*Clientが入っているとき
+			if _, ok := h.clients[client]; ok { //そのclientが登録されていれば
+				delete(h.clients, client) //削除する
+				close(client.send)        //そのclientのchannelをcloseする
 			}
-		case message := <-h.broadcast:
-			for client := range h.clients {
+		case message := <-h.broadcast: //Hubのbroadcastというchannelにmessage(byte)が入っているとき
+			for client := range h.clients { //登録されているclient全員に対して
 				select {
-				case client.send <- message:
-				default:
-					close(client.send)
-					delete(h.clients, client)
+				case client.send <- message: //messageを送ることができれば送る
+				default: //送ることができなければ
+					close(client.send)        //channelをcloseして
+					delete(h.clients, client) //Hubからdeleteする
 				}
 			}
 		}
