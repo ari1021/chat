@@ -20,7 +20,7 @@ type Hub struct {
 	unregister chan *Client
 }
 
-func newHub() *Hub { //新たにHubを作ってそのpointerを返す
+func NewHub() *Hub { //新たにHubを作ってそのpointerを返す
 	return &Hub{
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
@@ -29,7 +29,7 @@ func newHub() *Hub { //新たにHubを作ってそのpointerを返す
 	}
 }
 
-func (h *Hub) run() {
+func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.register: //Hubのregisterというchannelに*Clientが入っているとき

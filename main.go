@@ -8,6 +8,8 @@ import (
 	"flag"
 	"log"
 	"net/http"
+
+	"github.com/ari1021/websocket/server/websocket"
 )
 
 var addr = flag.String("addr", ":8080", "http service address")
@@ -27,11 +29,11 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	flag.Parse()
-	hub := newHub()
-	go hub.run()
+	hub := websocket.NewHub()
+	go hub.Run()
 	http.HandleFunc("/", serveHome)                                       // "/"を叩くとserveHomeが呼ばれる
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { // "/ws"を叩くとserveWsが呼ばれる
-		serveWs(hub, w, r)
+		websocket.ServeWs(hub, w, r)
 	})
 	err := http.ListenAndServe(*addr, nil) //　errorを受け取って処理する
 	if err != nil {
