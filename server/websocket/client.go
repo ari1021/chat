@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/labstack/echo/v4"
 )
 
 const (
@@ -32,20 +31,20 @@ var (
 	space   = []byte{' '}
 )
 
-var upgrader = websocket.Upgrader{
+var Upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
 
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
-	hub *Hub
+	Hub *Hub
 
 	// The websocket connection.
-	conn *websocket.Conn
+	Conn *websocket.Conn
 
 	// Buffered channel of outbound messages.
-	send chan []byte
+	Send chan []byte
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -53,16 +52,16 @@ type Client struct {
 // The application runs readPump in a per-connection goroutine. The application
 // ensures that there is at most one reader on a connection by executing all
 // reads from this goroutine.
-func (c *Client) readPump() {
+func (c *Client) ReadPump() {
 	defer func() {
-		c.hub.unregister <- c //Hubからunregisterして
-		c.conn.Close()        //connectionをcloseする
+		c.Hub.unregister <- c //Hubからunregisterして
+		c.Conn.Close()        //connectionをcloseする
 	}()
-	c.conn.SetReadLimit(maxMessageSize)
-	c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil }) //何かあればReadDeadlineを延長する
+	c.Conn.SetReadLimit(maxMessageSize)
+	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
+	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil }) //何かあればReadDeadlineを延長する
 	for {
-		_, message, err := c.conn.ReadMessage() //clientがmessageを送れば，c.conn.ReadMessage()でmessageが受け取れる
+		_, message, err := c.Conn.ReadMessage() //clientがmessageを送れば，c.conn.ReadMessage()でmessageが受け取れる
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
@@ -70,7 +69,7 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1)) //messageの改行をスペースに変える
-		c.hub.broadcast <- message                                            //Hubに送る
+		c.Hub.broadcast <- message                                            //Hubに送る
 	}
 }
 
@@ -79,59 +78,59 @@ func (c *Client) readPump() {
 // A goroutine running writePump is started for each connection. The
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
-func (c *Client) writePump() {
+func (c *Client) WritePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()  //tickerを止めて
-		c.conn.Close() //connectionをcloseする
+		c.Conn.Close() //connectionをcloseする
 	}()
 	for {
 		select {
-		case message, ok := <-c.send: //messageが送られてきたら，c.sendからmessageを取り出せる
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait)) //WriteDeadlineを延長する
+		case message, ok := <-c.Send: //messageが送られてきたら，c.sendからmessageを取り出せる
+			c.Conn.SetWriteDeadline(time.Now().Add(writeWait)) //WriteDeadlineを延長する
 			if !ok {
 				// The hub closed the channel.
-				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 
-			w, err := c.conn.NextWriter(websocket.TextMessage)
+			w, err := c.Conn.NextWriter(websocket.TextMessage)
 			if err != nil {
 				return
 			}
 			w.Write(message)
 
 			// Add queued chat messages to the current websocket message.
-			n := len(c.send)
+			n := len(c.Send)
 			for i := 0; i < n; i++ { //さらにc.sendにデータがあればそれも送る
 				w.Write(newline)
-				w.Write(<-c.send)
+				w.Write(<-c.Send)
 			}
 
 			if err := w.Close(); err != nil {
 				return
 			}
 		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
 		}
 	}
 }
 
-// serveWs handles websocket requests from the peer.
-func ServeWs(hub *Hub, c echo.Context) {
-	conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)} //clietを作成して
-	client.hub.register <- client                                         //Hubにregisterする
+// // serveWs handles websocket requests from the peer.
+// func ServeWs(hub *Hub, c echo.Context) {
+// 	conn, err := Upgrader.Upgrade(c.Response(), c.Request(), nil)
+// 	if err != nil {
+// 		log.Println(err)
+// 		return
+// 	}
+// 	client := &Client{Hub: hub, Conn: conn, Send: make(chan []byte, 256)} //clietを作成して
+// 	client.Hub.Register <- client                                         //Hubにregisterする
 
-	// Allow collection of memory referenced by the caller by doing all work in
-	// new goroutines.
-	go client.writePump()
-	go client.readPump()
-}
+// 	// Allow collection of memory referenced by the caller by doing all work in
+// 	// new goroutines.
+// 	go client.WritePump()
+// 	go client.ReadPump()
+// }
