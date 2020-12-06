@@ -20,7 +20,7 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Static("/", "./view/index.html")
+	e.File("/", "./view/index.html")
 	e.GET("/ws", func(c echo.Context) error {
 		websocket.ServeWs(hub, c)
 		return nil
