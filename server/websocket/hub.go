@@ -14,7 +14,7 @@ type Hub struct {
 	broadcast chan []byte
 
 	// Register requests from the clients.
-	register chan *Client
+	Register chan *Client
 
 	// Unregister requests from clients.
 	unregister chan *Client
@@ -23,7 +23,7 @@ type Hub struct {
 func NewHub() *Hub { //新たにHubを作ってそのpointerを返す
 	return &Hub{
 		broadcast:  make(chan []byte),
-		register:   make(chan *Client),
+		Register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
 	}
@@ -32,19 +32,19 @@ func NewHub() *Hub { //新たにHubを作ってそのpointerを返す
 func (h *Hub) Run() {
 	for {
 		select {
-		case client := <-h.register: //Hubのregisterというchannelに*Clientが入っているとき
+		case client := <-h.Register: //Hubのregisterというchannelに*Clientが入っているとき
 			h.clients[client] = true //clientを登録する
 		case client := <-h.unregister: //Hubのunregisterというchannelに*Clientが入っているとき
 			if _, ok := h.clients[client]; ok { //そのclientが登録されていれば
 				delete(h.clients, client) //削除する
-				close(client.send)        //そのclientのchannelをcloseする
+				close(client.Send)        //そのclientのchannelをcloseする
 			}
 		case message := <-h.broadcast: //Hubのbroadcastというchannelにmessage(byte)が入っているとき
 			for client := range h.clients { //登録されているclient全員に対して
 				select {
-				case client.send <- message: //messageを送ることができれば送る
+				case client.Send <- message: //messageを送ることができれば送る
 				default: //送ることができなければ
-					close(client.send)        //channelをcloseして
+					close(client.Send)        //channelをcloseして
 					delete(h.clients, client) //Hubからdeleteする
 				}
 			}
