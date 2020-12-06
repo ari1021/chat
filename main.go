@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"github.com/ari1021/websocket/server/websocket"
+	"github.com/labstack/echo/v4"
 )
 
 var addr = flag.String("addr", ":"+os.Getenv("PORT"), "http service address")
@@ -32,12 +33,25 @@ func main() {
 	flag.Parse()
 	hub := websocket.NewHub()
 	go hub.Run()
-	http.HandleFunc("/", serveHome)                                       // "/"を叩くとserveHomeが呼ばれる
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { // "/ws"を叩くとserveWsが呼ばれる
-		websocket.ServeWs(hub, w, r)
+	e := echo.New()
+	// e.Use(middleware.Logger())
+	// e.Use(middleware.Recover())
+	e.Static("/", "./view/index.html")
+	// e.GET("/", func(c echo.Context) error {
+	// 	return c.String(http.StatusOK, "Hello, world!")
+	// })
+	e.GET("/ws", func(c echo.Context) error {
+		websocket.ServeWs(hub, c)
+		return nil
 	})
-	err := http.ListenAndServe(*addr, nil) //　errorを受け取って処理する
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
+	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
+	// e.Logger.Fatal(e.Start(":1323"))
+	// http.HandleFunc("/", serveHome)                                       // "/"を叩くとserveHomeが呼ばれる
+	// http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { // "/ws"を叩くとserveWsが呼ばれる
+	// 	websocket.ServeWs(hub, w, r)
+	// })
+	// err := http.ListenAndServe(*addr, nil) //　errorを受け取って処理する
+	// if err != nil {
+	// 	log.Fatal("ListenAndServe: ", err)
+	// }
 }
