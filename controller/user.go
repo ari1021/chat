@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func createUser(c echo.Context) error {
+func CreateUser(c echo.Context) error {
 	uuidObj, err := uuid.NewRandom()
 	if err != nil {
 		return err
@@ -23,6 +23,6 @@ func createUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, u)
 }
 
-func getUsers(c echo.Context) error {
+func GetUsers(c echo.Context) error {
 	return c.JSON(http.StatusOK, model.Users)
 }

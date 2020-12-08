@@ -26,5 +26,7 @@ func main() {
 		controller.ServeWs(hub, c)
 		return nil
 	})
+	e.GET("/users", controller.GetUsers)
+	e.POST("/users", controller.CreateUser)
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }
