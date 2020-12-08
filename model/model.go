@@ -5,4 +5,4 @@ type User struct {
 	Name string `json:"name"`
 }
 
-var Users map[string]*User
+var Users = map[string]*User{}
