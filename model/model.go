@@ -1,6 +1,8 @@
 package model
 
-type user struct {
-	id   string
-	name string
+type User struct {
+	ID   string
+	Name string `json."name"`
 }
+
+var Users map[string]*user
