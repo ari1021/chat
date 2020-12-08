@@ -22,3 +22,7 @@ func createUser(c echo.Context) error {
 	model.Users[u.ID] = u
 	return c.JSON(http.StatusOK, u)
 }
+
+func getUsers(c echo.Context) error {
+	return c.JSON(http.StatusOK, model.Users)
+}
