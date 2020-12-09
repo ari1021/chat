@@ -2,7 +2,7 @@ package model
 
 type Room struct {
 	ID      int
-	Name    string
+	Name    string `form:"name" validate:"required, excludesall= "`
 	Members []*User
 }
 

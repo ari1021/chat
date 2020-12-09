@@ -9,7 +9,7 @@ import (
 
 var seq int = 1
 
-func createRoom(c echo.Context) error {
+func CreateRoom(c echo.Context) error {
 	r := &model.Room{
 		ID: seq,
 	}
