@@ -38,6 +38,7 @@ func main() {
 	e.Validator = &customValidator{Validator: validator.New()}
 	e.GET("/users", controller.GetUsers)
 	e.POST("/users", controller.CreateUser)
+	e.GET("/rooms", controller.GetRooms)
 	e.POST("/rooms", controller.CreateRoom)
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

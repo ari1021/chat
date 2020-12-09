@@ -23,3 +23,7 @@ func CreateRoom(c echo.Context) error {
 	seq += 1
 	return c.JSON(http.StatusOK, r)
 }
+
+func GetRooms(c echo.Context) error {
+	return c.JSON(http.StatusOK, model.Rooms)
+}
