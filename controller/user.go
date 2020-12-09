@@ -19,6 +19,9 @@ func CreateUser(c echo.Context) error {
 	if err := c.Bind(u); err != nil {
 		return err
 	}
+	if err := c.Validate(u); err != nil {
+		return err
+	}
 	model.Users[u.ID] = u
 	return c.JSON(http.StatusOK, u)
 }
