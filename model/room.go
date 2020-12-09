@@ -1,9 +1,9 @@
 package model
 
-type group struct {
-	id      int
-	name    string
-	members []*User
+type Group struct {
+	ID      int
+	Name    string
+	Members []*User
 }
 
-var groups = map[int]*group{}
+var Groups = map[int]*Group{}
