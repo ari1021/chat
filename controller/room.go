@@ -10,16 +10,16 @@ import (
 var seq int = 1
 
 func createRoom(c echo.Context) error {
-	g := &model.Group{
+	r := &model.Room{
 		ID: seq,
 	}
-	if err := c.Bind(g); err != nil {
+	if err := c.Bind(r); err != nil {
 		return err
 	}
-	if err := c.Validate(g); err != nil {
+	if err := c.Validate(r); err != nil {
 		return err
 	}
-	model.Groups[g.ID] = g
+	model.Rooms[r.ID] = r
 	seq += 1
-	return c.JSON(http.StatusOK, g)
+	return c.JSON(http.StatusOK, r)
 }
