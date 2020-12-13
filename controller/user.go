@@ -20,7 +20,11 @@ func CreateUser(c echo.Context) error {
 		return err
 	}
 	if err := c.Validate(u); err != nil {
-		return err
+		r := &model.APIError{
+			StatusCode: 400,
+			Message:    "user unprocessable entity",
+		}
+		return c.JSON(http.StatusBadRequest, r)
 	}
 	model.Users[u.ID] = u
 	return c.JSON(http.StatusOK, u)
