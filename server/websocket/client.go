@@ -58,8 +58,15 @@ func (c *Client) ReadPump() {
 		c.Conn.Close()        //connectionをcloseする
 	}()
 	c.Conn.SetReadLimit(maxMessageSize)
-	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil }) //何かあればReadDeadlineを延長する
+	if err := c.Conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
+		log.Printf("error: %v", err)
+	}
+	c.Conn.SetPongHandler(func(string) error {
+		if err := c.Conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
+			log.Printf("error: %v", err)
+		}
+		return nil
+	}) //何かあればReadDeadlineを延長する
 	for {
 		_, message, err := c.Conn.ReadMessage() //clientがmessageを送れば，c.conn.ReadMessage()でmessageが受け取れる
 		if err != nil {
@@ -87,10 +94,14 @@ func (c *Client) WritePump() {
 	for {
 		select {
 		case message, ok := <-c.Send: //messageが送られてきたら，c.sendからmessageを取り出せる
-			c.Conn.SetWriteDeadline(time.Now().Add(writeWait)) //WriteDeadlineを延長する
+			if err := c.Conn.SetWriteDeadline(time.Now().Add(writeWait)); err != nil {
+				log.Printf("error: %v", err)
+			} //WriteDeadlineを延長する
 			if !ok {
 				// The hub closed the channel.
-				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
+				if err := c.Conn.WriteMessage(websocket.CloseMessage, []byte{}); err != nil {
+					log.Printf("error: %v", err)
+				}
 				return
 			}
 
@@ -98,20 +109,28 @@ func (c *Client) WritePump() {
 			if err != nil {
 				return
 			}
-			w.Write(message)
+			if _, err := w.Write(message); err != nil {
+				log.Printf("error: %v", err)
+			}
 
 			// Add queued chat messages to the current websocket message.
 			n := len(c.Send)
 			for i := 0; i < n; i++ { //さらにc.sendにデータがあればそれも送る
-				w.Write(newline)
-				w.Write(<-c.Send)
+				if _, err := w.Write(newline); err != nil {
+					log.Printf("error: %v", err)
+				}
+				if _, err := w.Write(<-c.Send); err != nil {
+					log.Printf("error: %v", err)
+				}
 			}
 
 			if err := w.Close(); err != nil {
 				return
 			}
 		case <-ticker.C:
-			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.Conn.SetWriteDeadline(time.Now().Add(writeWait)); err != nil {
+				log.Printf("error: %v", err)
+			}
 			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
