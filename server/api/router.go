@@ -20,5 +20,7 @@ func NewEcho(hub *websocket.Hub) *echo.Echo {
 	e.Validator = &customValidator{Validator: validator.New()}
 	e.GET("/users", controller.GetUsers)
 	e.POST("/users", controller.CreateUser)
+	e.GET("/rooms", controller.GetRooms)
+	e.POST("/rooms", controller.CreateRoom)
 	return e
 }
