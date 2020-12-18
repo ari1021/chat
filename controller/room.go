@@ -17,7 +17,11 @@ func CreateRoom(c echo.Context) error {
 		return err
 	}
 	if err := c.Validate(r); err != nil {
-		return err
+		r := &model.APIError{
+			StatusCode: 400,
+			Message:    "room unprocessable entity",
+		}
+		return c.JSON(http.StatusBadRequest, r)
 	}
 	model.Rooms[r.ID] = r
 	seq += 1
