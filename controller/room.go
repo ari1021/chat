@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -36,18 +37,21 @@ func GetRooms(c echo.Context) error {
 	return c.JSON(http.StatusOK, model.Rooms)
 }
 
-func JoinRoom(c echo.Context) error {
+func JoinRoom(c echo.Context) {
 	roomIDStr := c.Param("id")
 	roomID, err := strconv.Atoi(roomIDStr)
 	if err != nil {
-		return err
+		log.Println(err)
+		return
 	}
 	conn, err := websocket.Upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
-		return err
+		log.Println(err)
+		return
 	}
 	hub := model.RoomToHub[roomID]
 	client := &websocket.Client{Hub: hub, Conn: conn, Send: make(chan []byte, 256)} //clientを作成して
 	client.Hub.Register <- client
-	return c.JSON(http.StatusOK, roomID)
+	go client.ReadPump()
+	go client.WritePump()
 }
