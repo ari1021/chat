@@ -1,5 +1,7 @@
 package model
 
+import "github.com/ari1021/websocket/server/websocket"
+
 type Room struct {
 	ID      int
 	Name    string `form:"name" validate:"required,excludesall= "`
@@ -7,3 +9,5 @@ type Room struct {
 }
 
 var Rooms = map[int]*Room{}
+
+var RoomToHub = map[int]*websocket.Hub{}
