@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/ari1021/websocket/model"
+	"github.com/ari1021/websocket/server/websocket"
 	"github.com/labstack/echo/v4"
 )
 
@@ -24,6 +25,8 @@ func CreateRoom(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, r)
 	}
 	model.Rooms[r.ID] = r
+	h := websocket.NewHub()
+	model.RoomToHub[r.ID] = h
 	seq += 1
 	return c.JSON(http.StatusOK, r)
 }
