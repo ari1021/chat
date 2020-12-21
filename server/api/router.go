@@ -16,7 +16,11 @@ func NewEcho(hub *websocket.Hub) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.File("/", "./view/index.html")
+
+	e.File("/", "./view/rooms.html")
+	e.File("/rooms/create", "./view/create_room.html")
+	e.File("/chat", "./view/chat.html")
+
 	e.GET("/ws/:id", func(c echo.Context) error {
 		// pathparamのgroupIdを取得
 		// groupID->*hubを取得
