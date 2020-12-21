@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Chat Example</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+  <script type="text/javascript">
+    window.onload = function() {
+      const baseURL = "http://localhost:8080";
+      var rooms = document.getElementById("rooms");
+
+      fetch(`${baseURL}/rooms`)
+        .then(response => response.json())
+        .then(data => {
+          var x = "";
+          Object.keys(data).forEach(function(key) {
+            const name = data[key]["Name"];
+            const id = data[key]["ID"];
+            x += `
+              <div class="shadow-sm p-3 mb-3 bg-white rounded">
+                <p>Name: ${name}</p>
+                <button onclick="location.href='${baseURL}/chat'">Join room</button>
+              </div>
+            `;
+            localStorage.setItem("id", id);
+          });
+          rooms.innerHTML = x;
+        });
+    };
+  </script>
+</head>
+<body>
+  <a href="/rooms/create">create room</a>
+  <div id="rooms"></div>
+</body>
+</html>
