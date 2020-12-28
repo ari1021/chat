@@ -6,20 +6,33 @@
 
 ## rooms
 
-| name        | Type     | pr  | required | uq  | fk(onupdate, ondelete) | default                     | description   |
-| ----------- | -------- | --- | -------- | --- | ---------------------- | --------------------------- | ------------- |
-| id          | int      | o   | True     |     |                        |                             | autoincrement |
-| createdAt   | Datetime |     | True     |     |                        | current_timestamp           |
-| updatedAt   | Datetime |     | True     |     |                        | current_timestamp on update |
-| deletedAt   | Datetime |     |          |     |                        |                             | ログ保管のため  |
+| name        | Type     | pr  | required | uq  | fk(onupdate, ondelete)  | default                     | description   |
+| ----------- | -------- | --- | -------- | --- | ----------------------- | --------------------------- | ------------- |
+| id          | int      | o   | True     |     |                         |                             | autoincrement |
+| createdAt   | Datetime |     | True     |     |                         | current_timestamp           |
+| updatedAt   | Datetime |     | True     |     |                         | current_timestamp on update |
+| deletedAt   | Datetime |     |          |     |                         |                             | ログ保管のため  |
 | name        | string   |     | True     | 1   |
+| user_id     | int      |     | True     |     | users(cascade, cascade) |
+
 
 ## chats
 
-| name      | Type     | pr  | required | uq  | fk(onupdate, ondelete)  | default                     | description  |
-| --------- | -------- | --- | -------- | --- | ----------------------- | --------------------------- | ------------ |
-| id        | int      | o   | True     |
+| name      | Type     | pr  | required | uq  | fk(onupdate, ondelete)  | default                     | description   |
+| --------- | -------- | --- | -------- | --- | ----------------------- | --------------------------- | ------------- |
+| id        | int      | o   | True     |     |                         |                             | autoincrement |
 | createdAt | Datetime |     | True     |     |                         | current_timestamp           |
 | room_id   | int      |     | True     |     | rooms(cascade, cascade) |
-| username  | string   |     | True     |
+| user_id   | string   |     | True     |     | users(cascade, cascade) |
 | chat      | string   |     | True     |
+
+
+## users
+
+| name               | Type     | pr  | required | uq  | fk(onupdate, ondelete)  | default                     | description   |
+| ------------------ | -------- | --- | -------- | --- | ----------------------- | --------------------------- | ------------- |
+| id                 | int      | o   | True     |     |                         |                             | autoincrement |
+| name               | string   |     | True     |
+| id_token           | string   |     | True     |     |                         |                             | 1000文字以上   |
+| access_token       | string   |     | True     |     |                         |                             | 1000文字以上   |
+| refresh_token      | string   |     | True     |     |                         |                             | 1000文字以上   |
