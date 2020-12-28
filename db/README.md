@@ -23,7 +23,7 @@
 | id         | int      | o   | True     |     |                         |                             | autoincrement |
 | created_at | Datetime |     | True     |     |                         | current_timestamp           |
 | room_id    | int      |     | True     |     | rooms(cascade, cascade) |
-| user_id    | string   |     | True     |     | users(cascade, cascade) |
+| user_id    | int      |     | True     |     | users(cascade, cascade) |
 | message    | string   |     | True     |
 
 
