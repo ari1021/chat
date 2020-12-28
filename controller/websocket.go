@@ -2,13 +2,29 @@ package controller
 
 import (
 	"log"
+	"strconv"
 
+	"github.com/ari1021/websocket/model"
 	"github.com/ari1021/websocket/server/websocket"
 	"github.com/labstack/echo/v4"
 )
 
+func ServeRoomWs(c echo.Context) error {
+	// pathparamのgroupIdを取得
+	// groupID->*hubを取得
+	roomIDStr := c.Param("id")
+	roomID, err := strconv.Atoi(roomIDStr)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	hub := model.RoomToHub[roomID]
+	serveWs(hub, c)
+	return nil
+}
+
 // serveWs handles websocket requests from the peer.
-func ServeWs(hub *websocket.Hub, c echo.Context) {
+func serveWs(hub *websocket.Hub, c echo.Context) {
 	conn, err := websocket.Upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		log.Println(err)

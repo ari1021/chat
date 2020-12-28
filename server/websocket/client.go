@@ -137,19 +137,3 @@ func (c *Client) WritePump() {
 		}
 	}
 }
-
-// // serveWs handles websocket requests from the peer.
-// func ServeWs(hub *Hub, c echo.Context) {
-// 	conn, err := Upgrader.Upgrade(c.Response(), c.Request(), nil)
-// 	if err != nil {
-// 		log.Println(err)
-// 		return
-// 	}
-// 	client := &Client{Hub: hub, Conn: conn, Send: make(chan []byte, 256)} //clietを作成して
-// 	client.Hub.Register <- client                                         //Hubにregisterする
-
-// 	// Allow collection of memory referenced by the caller by doing all work in
-// 	// new goroutines.
-// 	go client.WritePump()
-// 	go client.ReadPump()
-// }

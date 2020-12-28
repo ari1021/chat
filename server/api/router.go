@@ -12,13 +12,16 @@ func NewEcho(hub *websocket.Hub) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.File("/", "./view/index.html")
-	e.GET("/ws", func(c echo.Context) error {
-		controller.ServeWs(hub, c)
-		return nil
-	})
+
+	e.File("/", "./view/rooms.html")
+	e.File("/rooms/create", "./view/create_room.html")
+	e.File("/chat", "./view/chat.html")
+
+	e.GET("/ws/:id", controller.ServeRoomWs)
 	e.Validator = &customValidator{Validator: validator.New()}
 	e.GET("/users", controller.GetUsers)
 	e.POST("/users", controller.CreateUser)
+	e.GET("/rooms", controller.GetRooms)
+	e.POST("/rooms", controller.CreateRoom)
 	return e
 }
