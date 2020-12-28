@@ -24,7 +24,7 @@
 | createdAt | Datetime |     | True     |     |                         | current_timestamp           |
 | room_id   | int      |     | True     |     | rooms(cascade, cascade) |
 | user_id   | string   |     | True     |     | users(cascade, cascade) |
-| chat      | string   |     | True     |
+| message   | string   |     | True     |
 
 
 ## users
