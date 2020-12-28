@@ -32,7 +32,10 @@
 | name               | Type     | pr  | required | uq  | fk(onupdate, ondelete)  | default                     | description   |
 | ------------------ | -------- | --- | -------- | --- | ----------------------- | --------------------------- | ------------- |
 | id                 | int      | o   | True     |     |                         |                             | autoincrement |
+| createdAt          | Datetime |     | True     |     |                         | current_timestamp           |
+| updatedAt          | Datetime |     | True     |     |                         | current_timestamp on update |
+| deletedAt          | Datetime |     |          |     |                         |                             | ログ保管のため  |
 | name               | string   |     | True     |
-| id_token           | string   |     | True     |     |                         |                             | 1000文字以上   |
-| access_token       | string   |     | True     |     |                         |                             | 1000文字以上   |
-| refresh_token      | string   |     | True     |     |                         |                             | 1000文字以上   |
+| id_token           | string   |     |          |     |                         |                             | 1000文字以上   |
+| access_token       | string   |     |          |     |                         |                             | 1000文字以上   |
+| refresh_token      | string   |     |          |     |                         |                             | 1000文字以上   |
