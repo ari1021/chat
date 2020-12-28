@@ -35,7 +35,7 @@
 | created_at          | Datetime |     | True     |     |                         | current_timestamp           |
 | updated_at          | Datetime |     | True     |     |                         | current_timestamp on update |
 | deleted_at          | Datetime |     |          |     |                         |                             | ログ保管のため  |
-| name                | string   |     | True     |
+| name                | string   |     | True     | 1   |
 | id_token            | string   |     |          |     |                         |                             | 1000文字以上   |
 | access_token        | string   |     |          |     |                         |                             | 1000文字以上   |
 | refresh_token       | string   |     |          |     |                         |                             | 1000文字以上   |
