@@ -12,3 +12,18 @@ services:
       - ./:/go/src
     environment:
       PORT: 8080
+    networks:
+      - mysql_net
+  db:
+    image: 8.0
+    restart: always
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./db/data:/var/lib/mysql # コンテナ内のデータファイルを./db/dataと同期させる
+      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf # /etc/mysql/conf.d/my.cnfを読みにいくので同期させる
+    networks:
+      - mysql_net
+
+networks:
+  mysql_net:
