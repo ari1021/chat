@@ -18,3 +18,5 @@
 main
 
 go.sum
+
+db/data/
