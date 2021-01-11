@@ -11,7 +11,7 @@ type User struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	DeletedAt    gorm.DeletedAt `gorm:"index"`
-	Name         string         `form:"name" validate:"required,excludesall= " grom:"unique;not null"`
+	Name         string         `form:"name" validate:"required,excludesall= " gorm:"unique;not null"`
 	idToken      string
 	accessToken  string
 	refreshToken string
