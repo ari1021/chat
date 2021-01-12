@@ -8,7 +8,7 @@ import (
 type Room struct {
 	gorm.Model        // equal ID, CreatedAt, UpdatedAt, DeletedAt
 	Name       string `form:"name" validate:"required,excludesall= " gorm:"uniqueIndex"`
-	UserID     string
+	UserID     int
 	User       User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	// Members    []*User
 }

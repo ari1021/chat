@@ -11,5 +11,5 @@ type Chat struct {
 	Room      Room `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	UserID    int
 	User      User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Message   string `gorm:not null`
+	Message   string `gorm:"not null"`
 }
