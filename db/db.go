@@ -3,6 +3,7 @@ package db
 import (
 	"os"
 
+	"github.com/ari1021/websocket/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -33,4 +34,12 @@ func NewConnection() (*gorm.DB, error) {
 		return nil, err
 	}
 	return conn, err
+}
+
+func Migrate(conn *gorm.DB) {
+	conn.AutoMigrate(
+		&model.User{},
+		&model.Room{},
+		&model.Chat{},
+	)
 }

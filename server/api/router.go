@@ -26,5 +26,6 @@ func NewEcho(hub *websocket.Hub) *echo.Echo {
 	e.POST("/rooms", controller.CreateRoom)
 	conn, _ := db.NewConnection()
 	db.DB.Conn = conn
+	db.Migrate(conn)
 	return e
 }
