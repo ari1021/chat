@@ -1,6 +1,8 @@
 package db
 
 import (
+	"log"
+
 	"github.com/ari1021/websocket/config"
 	"github.com/ari1021/websocket/model"
 	"gorm.io/driver/mysql"
@@ -30,9 +32,11 @@ func NewConnection() (*gorm.DB, error) {
 }
 
 func Migrate(conn *gorm.DB) {
-	conn.AutoMigrate(
+	if err := conn.AutoMigrate(
 		&model.User{},
 		&model.Room{},
 		&model.Chat{},
-	)
+	); err != nil {
+		log.Println(err)
+	}
 }
