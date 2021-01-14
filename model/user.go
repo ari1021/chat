@@ -12,9 +12,9 @@ type User struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 	Name      string         `form:"name" validate:"required,excludesall= " gorm:"unique;not null"`
-	// idToken      string
-	// accessToken  string
-	// refreshToken string
+	// idToken      *string
+	// accessToken  *string
+	// refreshToken *string
 }
 
 var Users = map[string]*User{}
