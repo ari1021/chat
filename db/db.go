@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/ari1021/websocket/config"
 	"github.com/ari1021/websocket/model"
@@ -32,12 +31,13 @@ func NewConnection() (*gorm.DB, error) {
 	return conn, nil
 }
 
-func Migrate(conn *gorm.DB) {
+func Migrate(conn *gorm.DB) error {
 	if err := conn.AutoMigrate(
 		&model.User{},
 		&model.Room{},
 		&model.Chat{},
 	); err != nil {
-		log.Println(err)
+		return fmt.Errorf("failed to migrate: %w", err)
 	}
+	return nil
 }
