@@ -29,13 +29,13 @@ func NewConnection() (*gorm.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open MySQL: %w", err)
 	}
-	if err := Migrate(conn); err != nil {
+	if err := migrate(conn); err != nil {
 		log.Fatal(err)
 	}
 	return conn, nil
 }
 
-func Migrate(conn *gorm.DB) error {
+func migrate(conn *gorm.DB) error {
 	if err := conn.AutoMigrate(
 		&model.User{},
 		&model.Room{},
