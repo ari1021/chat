@@ -31,8 +31,5 @@ func NewEcho(hub *websocket.Hub) *echo.Echo {
 		log.Fatal(err)
 	}
 	db.DB.Conn = conn
-	if err := db.Migrate(conn); err != nil {
-		log.Fatal(err)
-	}
 	return e
 }

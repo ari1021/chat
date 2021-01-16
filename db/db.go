@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/ari1021/websocket/config"
 	"github.com/ari1021/websocket/model"
@@ -27,6 +28,9 @@ func NewConnection() (*gorm.DB, error) {
 	conn, err := gorm.Open(mysql.Open(DSN), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to open MySQL: %w", err)
+	}
+	if err := Migrate(conn); err != nil {
+		log.Fatal(err)
 	}
 	return conn, nil
 }
