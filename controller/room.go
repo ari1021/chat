@@ -12,7 +12,7 @@ var seq int = 1
 
 func CreateRoom(c echo.Context) error {
 	r := &model.Room{
-		ID: seq,
+		UserID: seq,
 	}
 	if err := c.Bind(r); err != nil {
 		return err
@@ -24,10 +24,10 @@ func CreateRoom(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, r)
 	}
-	model.Rooms[r.ID] = r
+	model.Rooms[r.UserID] = r
 	h := websocket.NewHub()
 	go h.Run()
-	model.RoomToHub[r.ID] = h
+	model.RoomToHub[r.UserID] = h
 	seq += 1
 	return c.JSON(http.StatusOK, r)
 }

@@ -1,7 +1,10 @@
 package api
 
 import (
+	"log"
+
 	"github.com/ari1021/websocket/controller"
+	"github.com/ari1021/websocket/db"
 	"github.com/ari1021/websocket/server/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -23,5 +26,10 @@ func NewEcho(hub *websocket.Hub) *echo.Echo {
 	e.POST("/users", controller.CreateUser)
 	e.GET("/rooms", controller.GetRooms)
 	e.POST("/rooms", controller.CreateRoom)
+	conn, err := db.NewConnection()
+	if err != nil {
+		log.Fatal(err)
+	}
+	db.DB.Conn = conn
 	return e
 }

@@ -1,11 +1,16 @@
 package model
 
-import "github.com/ari1021/websocket/server/websocket"
+import (
+	"github.com/ari1021/websocket/server/websocket"
+	"gorm.io/gorm"
+)
 
 type Room struct {
-	ID      int
-	Name    string `form:"name" validate:"required,excludesall= "`
-	Members []*User
+	gorm.Model        // equal ID, CreatedAt, UpdatedAt, DeletedAt
+	Name       string `form:"name" validate:"required,excludesall= " gorm:"size:255;uniqueIndex"`
+	UserID     int
+	User       User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	// Members    []*User
 }
 
 var Rooms = map[int]*Room{}
