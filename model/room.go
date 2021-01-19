@@ -14,7 +14,8 @@ type Room struct {
 	// Members    []*User
 }
 
-var Rooms = map[int]*Room{}
+// var Rooms = map[int]*Room{}
+type Rooms []Room
 
 var RoomToHub = map[int]*websocket.Hub{}
 
@@ -25,4 +26,13 @@ func (r *Room) Create(name string, user_id int) (*Room, error) {
 		return nil, err
 	}
 	return r, nil
+}
+
+func (r *Room) GetAll() (*Rooms, error) {
+	conn := db.DB.GetConnection()
+	var rooms Rooms
+	if err := conn.Find(&rooms).Error; err != nil {
+		return nil, err
+	}
+	return &rooms, nil
 }
