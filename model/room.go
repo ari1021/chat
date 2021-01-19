@@ -21,8 +21,7 @@ var RoomToHub = map[int]*websocket.Hub{}
 
 func (r *Room) Create(name string, user_id int) (*Room, error) {
 	conn := db.DB.GetConnection()
-	res := conn.Create(r)
-	if err := res.Error; err != nil {
+	if err := conn.Create(r).Error; err != nil {
 		return nil, err
 	}
 	return r, nil
