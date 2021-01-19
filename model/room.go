@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/ari1021/websocket/db"
 	"github.com/ari1021/websocket/server/websocket"
 	"gorm.io/gorm"
 )
@@ -16,3 +17,12 @@ type Room struct {
 var Rooms = map[int]*Room{}
 
 var RoomToHub = map[int]*websocket.Hub{}
+
+func (r *Room) Create(name string, user_id int) (*Room, error) {
+	conn := db.DB.GetConnection()
+	res := conn.Create(r)
+	if err := res.Error; err != nil {
+		return nil, err
+	}
+	return r, nil
+}
