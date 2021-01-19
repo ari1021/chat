@@ -17,9 +17,9 @@ type Room struct {
 // var Rooms = map[int]*Room{}
 type Rooms []Room
 
-var RoomToHub = map[int]*websocket.Hub{}
+var RoomToHub = map[uint]*websocket.Hub{}
 
-func (r *Room) Create(name string, user_id int) (*Room, error) {
+func (r *Room) Create() (*Room, error) {
 	conn := db.DB.GetConnection()
 	if err := conn.Create(r).Error; err != nil {
 		return nil, err

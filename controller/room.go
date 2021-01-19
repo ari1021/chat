@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/ari1021/websocket/model"
+	"github.com/ari1021/websocket/server/request"
 	"github.com/ari1021/websocket/server/websocket"
 	"github.com/labstack/echo/v4"
 )
@@ -11,24 +13,31 @@ import (
 var seq int = 1
 
 func CreateRoom(c echo.Context) error {
-	r := &model.Room{
-		UserID: seq,
-	}
-	if err := c.Bind(r); err != nil {
+	// frontからデータを取得
+	req := &request.CreateRoom{}
+	if err := c.Bind(req); err != nil {
 		return err
 	}
-	if err := c.Validate(r); err != nil {
+	// validationを行う
+	if err := c.Validate(req); err != nil {
 		r := &model.APIError{
 			StatusCode: 400,
 			Message:    "room unprocessable entity",
 		}
 		return c.JSON(http.StatusBadRequest, r)
 	}
-	model.Rooms[r.UserID] = r
+	// dbに保存
+	r := &model.Room{
+		Name:   req.Name,
+		UserID: req.UserId,
+	}
+	if _, err := r.Create(); err != nil {
+		log.Fatal(err)
+	}
+	// Hubを作成
 	h := websocket.NewHub()
 	go h.Run()
-	model.RoomToHub[r.UserID] = h
-	seq += 1
+	model.RoomToHub[r.Model.ID] = h
 	return c.JSON(http.StatusOK, r)
 }
 
