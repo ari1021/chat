@@ -32,3 +32,10 @@ func (r *Room) GetAll(conn *gorm.DB) (*Rooms, error) {
 	}
 	return &rooms, nil
 }
+
+func (r *Room) Delete(conn *gorm.DB) (*Room, error) {
+	if err := conn.Delete(r).Error; err != nil {
+		return nil, err
+	}
+	return r, nil
+}
