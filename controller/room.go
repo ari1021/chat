@@ -9,6 +9,7 @@ import (
 	"github.com/ari1021/websocket/server/request"
 	"github.com/ari1021/websocket/server/websocket"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 func CreateRoom(c echo.Context) error {
@@ -49,6 +50,33 @@ func GetRooms(c echo.Context) error {
 		log.Fatal(err)
 	}
 	return c.JSON(http.StatusOK, rooms)
+}
+
+func DeleteRoom(c echo.Context) error {
+	// frontからデータを取得
+	req := &request.DeleteRoom{}
+	if err := c.Bind(req); err != nil {
+		return err
+	}
+	// validationを行う
+	if err := c.Validate(req); err != nil {
+		r := &model.APIError{
+			StatusCode: 400,
+			Message:    "room_id bad entity",
+		}
+		return c.JSON(http.StatusBadRequest, r)
+	}
+	conn := db.DB.GetConnection()
+	r := &model.Room{
+		Model: gorm.Model{
+			ID: req.ID,
+		},
+	}
+	// dbから削除
+	if _, err := r.Delete(conn); err != nil {
+		log.Fatal(err)
+	}
+	return c.JSON(http.StatusOK, r)
 }
 
 // func JoinRoom(c echo.Context) error {
