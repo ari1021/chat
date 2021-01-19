@@ -18,7 +18,7 @@ func ServeRoomWs(c echo.Context) error {
 		log.Println(err)
 		return err
 	}
-	hub := model.RoomToHub[roomID]
+	hub := model.RoomToHub[uint(roomID)]
 	serveWs(hub, c)
 	return nil
 }
