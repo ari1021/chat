@@ -42,7 +42,12 @@ func CreateRoom(c echo.Context) error {
 }
 
 func GetRooms(c echo.Context) error {
-	return c.JSON(http.StatusOK, model.Rooms)
+	r := &model.Room{}
+	rooms, err := r.GetAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return c.JSON(http.StatusOK, rooms)
 }
 
 // func JoinRoom(c echo.Context) error {
