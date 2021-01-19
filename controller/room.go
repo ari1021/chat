@@ -3,6 +3,7 @@ package controller
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/ari1021/websocket/db"
 	"github.com/ari1021/websocket/model"
@@ -54,22 +55,17 @@ func GetRooms(c echo.Context) error {
 
 func DeleteRoom(c echo.Context) error {
 	// frontからデータを取得
-	req := &request.DeleteRoom{}
-	if err := c.Bind(req); err != nil {
+	roomIDStr := c.Param("id")
+	roomID, err := strconv.Atoi(roomIDStr)
+	if err != nil {
+		log.Println(err)
 		return err
 	}
-	// validationを行う
-	if err := c.Validate(req); err != nil {
-		r := &model.APIError{
-			StatusCode: 400,
-			Message:    "room_id bad entity",
-		}
-		return c.JSON(http.StatusBadRequest, r)
-	}
+
 	conn := db.DB.GetConnection()
 	r := &model.Room{
 		Model: gorm.Model{
-			ID: req.ID,
+			ID: uint(roomID),
 		},
 	}
 	// dbから削除
