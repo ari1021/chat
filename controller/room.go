@@ -4,13 +4,12 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/ari1021/websocket/db"
 	"github.com/ari1021/websocket/model"
 	"github.com/ari1021/websocket/server/request"
 	"github.com/ari1021/websocket/server/websocket"
 	"github.com/labstack/echo/v4"
 )
-
-var seq int = 1
 
 func CreateRoom(c echo.Context) error {
 	// frontからデータを取得
@@ -27,11 +26,12 @@ func CreateRoom(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, r)
 	}
 	// dbに保存
+	conn := db.DB.GetConnection()
 	r := &model.Room{
 		Name:   req.Name,
 		UserID: req.UserId,
 	}
-	if _, err := r.Create(); err != nil {
+	if _, err := r.Create(conn); err != nil {
 		log.Fatal(err)
 	}
 	// Hubを作成
@@ -43,7 +43,8 @@ func CreateRoom(c echo.Context) error {
 
 func GetRooms(c echo.Context) error {
 	r := &model.Room{}
-	rooms, err := r.GetAll()
+	conn := db.DB.GetConnection()
+	rooms, err := r.GetAll(conn)
 	if err != nil {
 		log.Fatal(err)
 	}

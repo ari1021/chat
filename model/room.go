@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/ari1021/websocket/db"
 	"github.com/ari1021/websocket/server/websocket"
 	"gorm.io/gorm"
 )
@@ -19,16 +18,14 @@ type Rooms []Room
 
 var RoomToHub = map[uint]*websocket.Hub{}
 
-func (r *Room) Create() (*Room, error) {
-	conn := db.DB.GetConnection()
+func (r *Room) Create(conn *gorm.DB) (*Room, error) {
 	if err := conn.Create(r).Error; err != nil {
 		return nil, err
 	}
 	return r, nil
 }
 
-func (r *Room) GetAll() (*Rooms, error) {
-	conn := db.DB.GetConnection()
+func (r *Room) GetAll(conn *gorm.DB) (*Rooms, error) {
 	var rooms Rooms
 	if err := conn.Find(&rooms).Error; err != nil {
 		return nil, err
