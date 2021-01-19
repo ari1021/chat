@@ -30,7 +30,7 @@ func CreateRoom(c echo.Context) error {
 	conn := db.DB.GetConnection()
 	r := &model.Room{
 		Name:   req.Name,
-		UserID: req.UserId,
+		UserID: req.UserID,
 	}
 	if _, err := r.Create(conn); err != nil {
 		log.Fatal(err)
