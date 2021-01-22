@@ -25,12 +25,11 @@ func (r *Room) Create(conn *gorm.DB) (*Room, error) {
 	return r, nil
 }
 
-func (r *Room) GetAll(conn *gorm.DB) (*Rooms, error) {
-	var rooms Rooms
-	if err := conn.Find(&rooms).Error; err != nil {
+func (r *Rooms) GetAll(conn *gorm.DB) (*Rooms, error) {
+	if err := conn.Find(r).Error; err != nil {
 		return nil, err
 	}
-	return &rooms, nil
+	return r, nil
 }
 
 func (r *Room) Delete(conn *gorm.DB) (*Room, error) {
