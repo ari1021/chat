@@ -46,7 +46,7 @@ func CreateRoom(c echo.Context) error {
 func GetRooms(c echo.Context) error {
 	r := &model.Rooms{}
 	conn := db.DB.GetConnection()
-	rooms, err := r.GetAll(conn)
+	rooms, err := r.FindAll(conn)
 	if err != nil {
 		log.Fatal(err)
 	}

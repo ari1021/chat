@@ -25,7 +25,7 @@ func (r *Room) Create(conn *gorm.DB) (*Room, error) {
 	return r, nil
 }
 
-func (r *Rooms) GetAll(conn *gorm.DB) (*Rooms, error) {
+func (r *Rooms) FindAll(conn *gorm.DB) (*Rooms, error) {
 	if err := conn.Find(r).Error; err != nil {
 		return nil, err
 	}
