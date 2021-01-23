@@ -21,11 +21,11 @@ func CreateRoom(c echo.Context) error {
 	}
 	// validationを行う
 	if err := c.Validate(req); err != nil {
-		r := &model.APIError{
+		res := &model.APIError{
 			StatusCode: 400,
 			Message:    "room unprocessable entity",
 		}
-		return c.JSON(http.StatusBadRequest, r)
+		return c.JSON(http.StatusBadRequest, res)
 	}
 	// dbに保存
 	conn := db.DB.GetConnection()
@@ -34,7 +34,25 @@ func CreateRoom(c echo.Context) error {
 		UserID: req.UserID,
 	}
 	if _, err := r.Create(conn); err != nil {
-		log.Fatal(err)
+		if model.IsForeignKeyError(err) {
+			res := &model.APIError{
+				StatusCode: 400,
+				Message:    "foreign key error",
+			}
+			return c.JSON(http.StatusBadRequest, res)
+		} else if model.IsDuplicateKeyError(err) {
+			res := &model.APIError{
+				StatusCode: 400,
+				Message:    "duplicate key error",
+			}
+			return c.JSON(http.StatusBadRequest, res)
+		} else {
+			res := &model.APIError{
+				StatusCode: 500,
+				Message:    "database error",
+			}
+			return c.JSON(http.StatusInternalServerError, res)
+		}
 	}
 	// Hubを作成
 	h := websocket.NewHub()
