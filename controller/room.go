@@ -2,9 +2,7 @@ package controller
 
 import (
 	"errors"
-	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/ari1021/websocket/db"
 	"github.com/ari1021/websocket/model"
@@ -78,17 +76,14 @@ func GetRooms(c echo.Context) error {
 
 func DeleteRoom(c echo.Context) error {
 	// frontからデータを取得
-	roomIDStr := c.Param("id")
-	roomID, err := strconv.Atoi(roomIDStr)
-	if err != nil {
-		log.Println(err)
+	req := &request.DeleteRoom{}
+	if err := c.Bind(req); err != nil {
 		return err
 	}
-
 	conn := db.DB.GetConnection()
 	r := &model.Room{
 		Model: gorm.Model{
-			ID: uint(roomID),
+			ID: uint(req.ID),
 		},
 	}
 	// dbから削除
