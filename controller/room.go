@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -92,7 +93,19 @@ func DeleteRoom(c echo.Context) error {
 	}
 	// dbから削除
 	if _, err := r.Delete(conn); err != nil {
-		log.Fatal(err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			res := &model.APIError{
+				StatusCode: 400,
+				Message:    "record not found",
+			}
+			return c.JSON(http.StatusBadRequest, res)
+		} else {
+			res := &model.APIError{
+				StatusCode: 500,
+				Message:    "database error",
+			}
+			return c.JSON(http.StatusInternalServerError, res)
+		}
 	}
 	return c.JSON(http.StatusOK, r)
 }

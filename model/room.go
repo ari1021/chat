@@ -33,7 +33,10 @@ func (r *Rooms) FindAll(conn *gorm.DB) (*Rooms, error) {
 }
 
 func (r *Room) Delete(conn *gorm.DB) (*Room, error) {
-	if err := conn.Delete(r).Error; err != nil {
+	result := conn.Delete(r)
+	if result.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	} else if err := result.Error; err != nil {
 		return nil, err
 	}
 	return r, nil
