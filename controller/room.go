@@ -66,7 +66,11 @@ func GetRooms(c echo.Context) error {
 	conn := db.DB.GetConnection()
 	rooms, err := r.FindAll(conn)
 	if err != nil {
-		log.Fatal(err)
+		res := &model.APIError{
+			StatusCode: 500,
+			Message:    "database error",
+		}
+		return c.JSON(http.StatusInternalServerError, res)
 	}
 	return c.JSON(http.StatusOK, rooms)
 }
