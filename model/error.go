@@ -9,6 +9,14 @@ type APIError struct {
 	Message    string
 }
 
+func NewAPIError(StatusCode int, Message string) *APIError {
+	res := &APIError{
+		StatusCode: 500,
+		Message:    "database error",
+	}
+	return res
+}
+
 func IsDuplicateKeyError(err error) bool {
 	me, ok := err.(*mysql.MySQLError)
 	if !ok {
