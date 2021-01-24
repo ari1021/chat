@@ -20,10 +20,7 @@ func CreateRoom(c echo.Context) error {
 	}
 	// validationを行う
 	if err := c.Validate(req); err != nil {
-		res := &model.APIError{
-			StatusCode: 400,
-			Message:    "room unprocessable entity",
-		}
+		res := model.NewAPIError(400, "room unprocessable entity")
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	// dbに保存
@@ -33,23 +30,18 @@ func CreateRoom(c echo.Context) error {
 		UserID: req.UserID,
 	}
 	if _, err := r.Create(conn); err != nil {
-		if model.IsForeignKeyError(err) {
-			res := &model.APIError{
-				StatusCode: 400,
-				Message:    "foreign key error",
-			}
+		switch model.CheckMySQLError(err) {
+		case model.ForeignKeyError:
+			res := model.NewAPIError(400, "foreign key error")
 			return c.JSON(http.StatusBadRequest, res)
-		} else if model.IsDuplicateKeyError(err) {
-			res := &model.APIError{
-				StatusCode: 400,
-				Message:    "duplicate key error",
-			}
+		case model.DuplicateKeyError:
+			res := model.NewAPIError(400, "duplicate key error")
 			return c.JSON(http.StatusBadRequest, res)
-		} else {
-			res := &model.APIError{
-				StatusCode: 500,
-				Message:    "database error",
-			}
+		case model.DatabaseError:
+			res := model.NewAPIError(500, "database error")
+			return c.JSON(http.StatusInternalServerError, res)
+		default:
+			res := model.NewAPIError(500, "unknown error")
 			return c.JSON(http.StatusInternalServerError, res)
 		}
 	}
@@ -65,10 +57,7 @@ func GetRooms(c echo.Context) error {
 	conn := db.DB.GetConnection()
 	rooms, err := r.FindAll(conn)
 	if err != nil {
-		res := &model.APIError{
-			StatusCode: 500,
-			Message:    "database error",
-		}
+		res := model.NewAPIError(500, "database error")
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	return c.JSON(http.StatusOK, rooms)
@@ -89,38 +78,12 @@ func DeleteRoom(c echo.Context) error {
 	// dbから削除
 	if _, err := r.Delete(conn); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			res := &model.APIError{
-				StatusCode: 400,
-				Message:    "record not found",
-			}
+			res := model.NewAPIError(400, "record not found")
 			return c.JSON(http.StatusBadRequest, res)
 		} else {
-			res := &model.APIError{
-				StatusCode: 500,
-				Message:    "database error",
-			}
+			res := model.NewAPIError(500, "database error")
 			return c.JSON(http.StatusInternalServerError, res)
 		}
 	}
 	return c.JSON(http.StatusOK, r)
 }
-
-// func JoinRoom(c echo.Context) error {
-// 	roomIDStr := c.Param("id")
-// 	roomID, err := strconv.Atoi(roomIDStr)
-// 	if err != nil {
-// 		log.Println(err)
-// 		return err
-// 	}
-// 	conn, err := websocket.Upgrader.Upgrade(c.Response(), c.Request(), nil)
-// 	if err != nil {
-// 		log.Println(err)
-// 		return err
-// 	}
-// 	hub := model.RoomToHub[roomID]
-// 	client := &websocket.Client{Hub: hub, Conn: conn, Send: make(chan []byte, 256)} //clientを作成して
-// 	client.Hub.Register <- client
-// 	go client.ReadPump()
-// 	go client.WritePump()
-// 	return c.JSON(http.StatusOK, roomID)
-// }
