@@ -1,7 +1,16 @@
 package model
 
 import (
+	"errors"
+
 	"github.com/go-sql-driver/mysql"
+)
+
+var (
+	DuplicateKeyError = errors.New("Duplicate key error")
+	ForeignKeyError   = errors.New("Foreign key error")
+	DatabaseError     = errors.New("Database error")
+	UnknownError      = errors.New("Unknown error")
 )
 
 type APIError struct {
@@ -9,32 +18,26 @@ type APIError struct {
 	Message    string
 }
 
-func NewAPIError(StatusCode int, Message string) *APIError {
+func NewAPIError(statusCode int, message string) *APIError {
 	res := &APIError{
-		StatusCode: 500,
-		Message:    "database error",
+		StatusCode: statusCode,
+		Message:    message,
 	}
 	return res
 }
 
-func IsDuplicateKeyError(err error) bool {
+func CheckMySQLError(err error) error {
 	me, ok := err.(*mysql.MySQLError)
 	if !ok {
-		return false
+		return UnknownError
+	} else {
+		switch me.Number {
+		case 1062:
+			return DuplicateKeyError
+		case 1452:
+			return ForeignKeyError
+		default:
+			return DatabaseError
+		}
 	}
-	if me.Number == 1062 {
-		return true
-	}
-	return false
-}
-
-func IsForeignKeyError(err error) bool {
-	me, ok := err.(*mysql.MySQLError)
-	if !ok {
-		return false
-	}
-	if me.Number == 1452 {
-		return true
-	}
-	return false
 }
