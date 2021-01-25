@@ -24,3 +24,10 @@ func (c *Chats) Find(conn *gorm.DB, groupID int, limit int, offset int) (*Chats,
 	}
 	return c, nil
 }
+
+func (c *Chat) Create(conn *gorm.DB) (*Chat, error) {
+	if err := conn.Create(c).Error; err != nil {
+		return nil, err
+	}
+	return c, nil
+}
