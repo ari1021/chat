@@ -42,3 +42,22 @@ func CreateChat(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, chat)
 }
+
+func GetChats(c echo.Context) error {
+	req := &request.GetChats{}
+	if err := c.Bind(req); err != nil {
+		return err
+	}
+	if err := c.Validate(req); err != nil {
+		res := model.NewAPIError(400, "limit or offset not found")
+		return c.JSON(http.StatusBadRequest, res)
+	}
+	conn := db.DB.GetConnection()
+	chats := &model.Chats{}
+	chats, err := chats.Find(conn, req.RoomID, req.Limit, req.Offset)
+	if err != nil {
+		res := model.NewAPIError(500, "database error")
+		return c.JSON(http.StatusInternalServerError, res)
+	}
+	return c.JSON(http.StatusOK, chats)
+}
