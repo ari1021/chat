@@ -27,6 +27,8 @@ func NewEcho(hub *websocket.Hub) *echo.Echo {
 	e.GET("/rooms", controller.GetRooms)
 	e.POST("/rooms", controller.CreateRoom)
 	e.DELETE("/rooms/:id", controller.DeleteRoom)
+	e.GET("/rooms/:id/chats", controller.GetChats)
+	e.POST("/rooms/:id/chats", controller.CreateChat)
 	conn, err := db.NewConnection()
 	if err != nil {
 		log.Fatal(err)
