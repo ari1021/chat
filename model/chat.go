@@ -18,8 +18,8 @@ type Chat struct {
 
 type Chats []Chat
 
-func (c *Chats) Find(conn *gorm.DB, groupID int, limit int, offset int) (*Chats, error) {
-	if err := conn.Order("created_at　desc").Limit(limit).Offset(offset).Find(c, "room_id = ?", groupID).Error; err != nil {
+func (c *Chats) Find(conn *gorm.DB, roomID int, limit int, offset int) (*Chats, error) {
+	if err := conn.Order("created_at　desc").Limit(limit).Offset(offset).Find(c, "room_id = ?", roomID).Error; err != nil {
 		return nil, err
 	}
 	return c, nil
