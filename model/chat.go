@@ -7,8 +7,8 @@ import (
 )
 
 type Chat struct {
-	ID        int `gorm:"primaryKey"`
-	CreatedAt time.Time
+	ID        int       `gorm:"primaryKey"`
+	CreatedAt time.Time `gorm:"index"`
 	RoomID    int
 	Room      Room   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	UserID    string `gorm:"size:255"`
