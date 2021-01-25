@@ -27,7 +27,7 @@ func NewAPIError(statusCode int, message string) *APIError {
 	return res
 }
 
-func CheckMySQLError(err error) error {
+func checkMySQLError(err error) error {
 	me, ok := err.(*mysql.MySQLError)
 	if !ok {
 		return UnknownError
@@ -43,8 +43,8 @@ func CheckMySQLError(err error) error {
 	}
 }
 
-func NewMySQLError(err error) (statusCode int, res *APIError) {
-	switch CheckMySQLError(err) {
+func NewAPIResponse(err error) (statusCode int, res *APIError) {
+	switch checkMySQLError(err) {
 	case ForeignKeyError:
 		res := NewAPIError(400, "foreign key error")
 		return http.StatusBadRequest, res

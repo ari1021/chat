@@ -25,7 +25,7 @@ func CreateChat(c echo.Context) error {
 		Message: req.Message,
 	}
 	if _, err := chat.Create(conn); err != nil {
-		statusCode, res := model.NewMySQLError(err)
+		statusCode, res := model.NewAPIResponse(err)
 		return c.JSON(statusCode, res)
 	}
 	return c.JSON(http.StatusOK, chat)

@@ -30,7 +30,7 @@ func CreateRoom(c echo.Context) error {
 		UserID: req.UserID,
 	}
 	if _, err := r.Create(conn); err != nil {
-		statusCode, res := model.NewMySQLError(err)
+		statusCode, res := model.NewAPIResponse(err)
 		return c.JSON(statusCode, res)
 	}
 	// Hubを作成
