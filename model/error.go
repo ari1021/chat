@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -39,5 +40,22 @@ func CheckMySQLError(err error) error {
 		default:
 			return DatabaseError
 		}
+	}
+}
+
+func NewMySQLError(err error) (statusCode int, res *APIError) {
+	switch CheckMySQLError(err) {
+	case ForeignKeyError:
+		res := NewAPIError(400, "foreign key error")
+		return http.StatusBadRequest, res
+	case DuplicateKeyError:
+		res := NewAPIError(400, "duplicate key error")
+		return http.StatusBadRequest, res
+	case DatabaseError:
+		res := NewAPIError(500, "database error")
+		return http.StatusInternalServerError, res
+	default:
+		res := NewAPIError(500, "unknown error")
+		return http.StatusInternalServerError, res
 	}
 }

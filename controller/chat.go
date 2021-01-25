@@ -25,20 +25,8 @@ func CreateChat(c echo.Context) error {
 		Message: req.Message,
 	}
 	if _, err := chat.Create(conn); err != nil {
-		switch model.CheckMySQLError(err) {
-		case model.ForeignKeyError:
-			res := model.NewAPIError(400, "foreign key error")
-			return c.JSON(http.StatusBadRequest, res)
-		case model.DuplicateKeyError:
-			res := model.NewAPIError(400, "duplicate key error")
-			return c.JSON(http.StatusBadRequest, res)
-		case model.DatabaseError:
-			res := model.NewAPIError(500, "database error")
-			return c.JSON(http.StatusInternalServerError, res)
-		default:
-			res := model.NewAPIError(500, "unknown error")
-			return c.JSON(http.StatusInternalServerError, res)
-		}
+		statusCode, res := model.NewMySQLError(err)
+		return c.JSON(statusCode, res)
 	}
 	return c.JSON(http.StatusOK, chat)
 }
