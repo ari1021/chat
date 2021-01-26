@@ -30,20 +30,8 @@ func CreateRoom(c echo.Context) error {
 		UserID: req.UserID,
 	}
 	if _, err := r.Create(conn); err != nil {
-		switch model.CheckMySQLError(err) {
-		case model.ForeignKeyError:
-			res := model.NewAPIError(400, "foreign key error")
-			return c.JSON(http.StatusBadRequest, res)
-		case model.DuplicateKeyError:
-			res := model.NewAPIError(400, "duplicate key error")
-			return c.JSON(http.StatusBadRequest, res)
-		case model.DatabaseError:
-			res := model.NewAPIError(500, "database error")
-			return c.JSON(http.StatusInternalServerError, res)
-		default:
-			res := model.NewAPIError(500, "unknown error")
-			return c.JSON(http.StatusInternalServerError, res)
-		}
+		statusCode, res := model.NewAPIResponse(err)
+		return c.JSON(statusCode, res)
 	}
 	// Hubを作成
 	h := websocket.NewHub()
