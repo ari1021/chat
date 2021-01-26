@@ -13,7 +13,7 @@
 | updated_at   | Datetime |     | True     |     |                         | current_timestamp on update |
 | deleted_at   | Datetime |     |          |     |                         |                             | ログ保管のため  |
 | name         | string   |     | True     | 1   |
-| user_id      | int      |     | True     |     | users(cascade, cascade) |
+| user_id      | string   |     | True     |     | users(cascade, cascade) |
 
 
 ## chats
@@ -23,7 +23,7 @@
 | id         | int      | o   | True     |     |                         |                             | autoincrement |
 | created_at | Datetime |     | True     |     |                         | current_timestamp           |
 | room_id    | int      |     | True     |     | rooms(cascade, cascade) |
-| user_id    | int      |     | True     |     | users(cascade, cascade) |
+| user_id    | string   |     | True     |     | users(cascade, cascade) |
 | message    | string   |     | True     |
 
 
@@ -31,7 +31,7 @@
 
 | name                | Type     | pr  | required | uq  | fk(onupdate, ondelete)  | default                     | description   |
 | ------------------- | -------- | --- | -------- | --- | ----------------------- | --------------------------- | ------------- |
-| id                  | int      | o   | True     |     |                         |                             | autoincrement |
+| id                  | string   | o   | True     |     |                         |                             | autoincrement |
 | created_at          | Datetime |     | True     |     |                         | current_timestamp           |
 | updated_at          | Datetime |     | True     |     |                         | current_timestamp on update |
 | deleted_at          | Datetime |     |          |     |                         |                             | ログ保管のため  |
