@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/ari1021/websocket/controller"
-	"github.com/ari1021/websocket/db"
+	"github.com/ari1021/websocket/server/db"
 	"github.com/ari1021/websocket/server/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
