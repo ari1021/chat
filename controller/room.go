@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/ari1021/websocket/db"
 	"github.com/ari1021/websocket/model"
+	"github.com/ari1021/websocket/server/db"
 	"github.com/ari1021/websocket/server/request"
 	"github.com/ari1021/websocket/server/websocket"
 	"github.com/labstack/echo/v4"
