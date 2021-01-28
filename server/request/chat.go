@@ -9,5 +9,4 @@ type GetChats struct {
 type CreateChat struct {
 	Message string `form:"message" validate:"required,excludesall= "`
 	RoomID  int    `param:"id"`
-	UserID  string `form:"user_id" validate:"required"`
 }
