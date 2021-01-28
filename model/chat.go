@@ -11,8 +11,6 @@ type Chat struct {
 	CreatedAt time.Time `gorm:"index"`
 	RoomID    int
 	Room      Room   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	UserID    string `gorm:"size:255"`
-	User      User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Message   string `gorm:"not null"`
 }
 

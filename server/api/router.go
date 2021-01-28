@@ -22,8 +22,6 @@ func NewEcho(hub *websocket.Hub) *echo.Echo {
 
 	e.GET("/ws/:id", controller.ServeRoomWs)
 	e.Validator = &customValidator{Validator: validator.New()}
-	e.GET("/users", controller.GetUsers)
-	e.POST("/users", controller.CreateUser)
 	e.GET("/rooms", controller.GetRooms)
 	e.POST("/rooms", controller.CreateRoom)
 	e.DELETE("/rooms/:id", controller.DeleteRoom)

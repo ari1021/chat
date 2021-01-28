@@ -26,8 +26,7 @@ func CreateRoom(c echo.Context) error {
 	// dbに保存
 	conn := db.DB.GetConnection()
 	r := &model.Room{
-		Name:   req.Name,
-		UserID: req.UserID,
+		Name: req.Name,
 	}
 	if _, err := r.Create(conn); err != nil {
 		statusCode, res := model.NewAPIResponse(err)

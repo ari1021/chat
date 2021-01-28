@@ -21,7 +21,6 @@ func CreateChat(c echo.Context) error {
 	conn := db.DB.GetConnection()
 	chat := &model.Chat{
 		RoomID:  req.RoomID,
-		UserID:  req.UserID,
 		Message: req.Message,
 	}
 	if _, err := chat.Create(conn); err != nil {
