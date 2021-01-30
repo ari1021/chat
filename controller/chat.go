@@ -20,8 +20,9 @@ func CreateChat(c echo.Context) error {
 	}
 	conn := db.DB.GetConnection()
 	chat := &model.Chat{
-		RoomID:  req.RoomID,
-		Message: req.Message,
+		RoomID:   req.RoomID,
+		Message:  req.Message,
+		UserName: req.UserName,
 	}
 	if _, err := chat.Create(conn); err != nil {
 		statusCode, res := model.NewAPIResponse(err)
