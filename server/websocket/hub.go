@@ -18,6 +18,12 @@ type Hub struct {
 
 	// Unregister requests from clients.
 	unregister chan *Client
+
+	//外部から停止通知を送るためのchannel
+	stop chan struct{}
+
+	//goroutineの終了時に外部へ完了通知を送るためのchannel
+	done chan struct{}
 }
 
 func NewHub() *Hub { //新たにHubを作ってそのpointerを返す
@@ -26,6 +32,8 @@ func NewHub() *Hub { //新たにHubを作ってそのpointerを返す
 		Register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
+		stop:       make(chan struct{}),
+		done:       make(chan struct{}),
 	}
 }
 
