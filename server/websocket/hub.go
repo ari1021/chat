@@ -4,6 +4,8 @@
 
 package websocket
 
+import "log"
+
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
@@ -38,6 +40,7 @@ func NewHub() *Hub { //新たにHubを作ってそのpointerを返す
 }
 
 func (h *Hub) Run() {
+	defer func() { close(h.done) }()
 	for {
 		select {
 		case client := <-h.Register: //Hubのregisterというchannelに*Clientが入っているとき
@@ -56,6 +59,9 @@ func (h *Hub) Run() {
 					delete(h.clients, client) //Hubからdeleteする
 				}
 			}
+		case <-h.stop: //stopがcloseした場合，forループを抜ける
+			log.Print("stop recieved")
+			return
 		}
 	}
 }
