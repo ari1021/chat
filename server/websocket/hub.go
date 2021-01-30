@@ -4,7 +4,9 @@
 
 package websocket
 
-import "log"
+import (
+	"log"
+)
 
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
@@ -64,4 +66,9 @@ func (h *Hub) Run() {
 			return
 		}
 	}
+}
+
+func (h *Hub) Stop() {
+	close(h.stop)
+	<-h.done
 }
