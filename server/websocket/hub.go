@@ -4,6 +4,10 @@
 
 package websocket
 
+import (
+	"log"
+)
+
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
@@ -18,6 +22,12 @@ type Hub struct {
 
 	// Unregister requests from clients.
 	unregister chan *Client
+
+	//外部から停止通知を送るためのchannel
+	stop chan struct{}
+
+	//goroutineの終了時に外部へ完了通知を送るためのchannel
+	done chan struct{}
 }
 
 func NewHub() *Hub { //新たにHubを作ってそのpointerを返す
@@ -26,10 +36,13 @@ func NewHub() *Hub { //新たにHubを作ってそのpointerを返す
 		Register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
+		stop:       make(chan struct{}),
+		done:       make(chan struct{}),
 	}
 }
 
 func (h *Hub) Run() {
+	defer func() { close(h.done) }()
 	for {
 		select {
 		case client := <-h.Register: //Hubのregisterというchannelに*Clientが入っているとき
@@ -48,6 +61,14 @@ func (h *Hub) Run() {
 					delete(h.clients, client) //Hubからdeleteする
 				}
 			}
+		case <-h.stop: //stopがcloseした場合，forループを抜ける
+			log.Print("stop recieved")
+			return
 		}
 	}
+}
+
+func (h *Hub) Stop() {
+	close(h.stop)
+	<-h.done
 }

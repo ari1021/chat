@@ -73,5 +73,9 @@ func DeleteRoom(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, res)
 		}
 	}
+	// Hubをstopする
+	model.RoomToHub[r.Model.ID].Stop()
+	// Hubを削除
+	delete(model.RoomToHub, r.Model.ID)
 	return c.JSON(http.StatusOK, r)
 }
