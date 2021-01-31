@@ -37,7 +37,6 @@ func NewConnection() (*gorm.DB, error) {
 
 func migrate(conn *gorm.DB) error {
 	if err := conn.AutoMigrate(
-		&model.User{},
 		&model.Room{},
 		&model.Chat{},
 	); err != nil {

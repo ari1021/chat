@@ -8,9 +8,6 @@ import (
 type Room struct {
 	gorm.Model        // equal ID, CreatedAt, UpdatedAt, DeletedAt
 	Name       string `form:"name" validate:"required,excludesall= " gorm:"size:255;uniqueIndex"`
-	UserID     string `gorm:"size:255"`
-	User       User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	// Members    []*User
 }
 
 // var Rooms = map[int]*Room{}
