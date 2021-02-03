@@ -5,6 +5,12 @@ import (
 	"gorm.io/gorm"
 )
 
+type IRoom interface {
+	Create(conn *gorm.DB) (*Room, error)
+	FindAll(conn *gorm.DB) (*Rooms, error)
+	Delete(conn *gorm.DB) (*Room, error)
+}
+
 type Room struct {
 	gorm.Model        // equal ID, CreatedAt, UpdatedAt, DeletedAt
 	Name       string `form:"name" validate:"required,excludesall= " gorm:"size:255;uniqueIndex"`
