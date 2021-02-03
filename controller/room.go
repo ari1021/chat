@@ -12,7 +12,19 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateRoom(c echo.Context) error {
+type RoomHandler struct {
+	db   db.DBConnection
+	room *model.Room
+}
+
+func NewRoomHandler(db db.DBConnection, room *model.Room) RoomHandler {
+	return RoomHandler{
+		db:   db,
+		room: room,
+	}
+}
+
+func (rh RoomHandler) CreateRoom(c echo.Context) error {
 	// frontからデータを取得
 	req := &request.CreateRoom{}
 	if err := c.Bind(req); err != nil {
@@ -24,10 +36,8 @@ func CreateRoom(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	// dbに保存
-	conn := db.DB.GetConnection()
-	r := &model.Room{
-		Name: req.Name,
-	}
+	conn := rh.db.GetConnection()
+	r := rh.room
 	if _, err := r.Create(conn); err != nil {
 		statusCode, res := model.NewAPIResponse(err)
 		return c.JSON(statusCode, res)
@@ -38,6 +48,33 @@ func CreateRoom(c echo.Context) error {
 	model.RoomToHub[r.Model.ID] = h
 	return c.JSON(http.StatusOK, r)
 }
+
+// func CreateRoom(c echo.Context) error {
+// 	// frontからデータを取得
+// 	req := &request.CreateRoom{}
+// 	if err := c.Bind(req); err != nil {
+// 		return err
+// 	}
+// 	// validationを行う
+// 	if err := c.Validate(req); err != nil {
+// 		res := model.NewAPIError(400, "room unprocessable entity")
+// 		return c.JSON(http.StatusBadRequest, res)
+// 	}
+// 	// dbに保存
+// 	conn := db.DB.GetConnection()
+// 	r := &model.Room{
+// 		Name: req.Name,
+// 	}
+// 	if _, err := r.Create(conn); err != nil {
+// 		statusCode, res := model.NewAPIResponse(err)
+// 		return c.JSON(statusCode, res)
+// 	}
+// 	// Hubを作成
+// 	h := websocket.NewHub()
+// 	go h.Run()
+// 	model.RoomToHub[r.Model.ID] = h
+// 	return c.JSON(http.StatusOK, r)
+// }
 
 func GetRooms(c echo.Context) error {
 	r := &model.Rooms{}

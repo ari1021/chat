@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/ari1021/websocket/controller"
+	"github.com/ari1021/websocket/model"
 	"github.com/ari1021/websocket/server/db"
 	"github.com/ari1021/websocket/server/websocket"
 	"github.com/labstack/echo/v4"
@@ -23,7 +24,8 @@ func NewEcho(hub *websocket.Hub) *echo.Echo {
 	e.GET("/ws/:id", controller.ServeRoomWs)
 	e.Validator = &customValidator{Validator: validator.New()}
 	e.GET("/rooms", controller.GetRooms)
-	e.POST("/rooms", controller.CreateRoom)
+	rh := controller.NewRoomHandler(db.DB, &model.Room{})
+	e.POST("/rooms", rh.CreateRoom)
 	e.DELETE("/rooms/:id", controller.DeleteRoom)
 	e.GET("/rooms/:id/chats", controller.GetChats)
 	e.POST("/rooms/:id/chats", controller.CreateChat)
