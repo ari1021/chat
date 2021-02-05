@@ -6,10 +6,10 @@ import (
 	"github.com/ari1021/websocket/controller"
 	"github.com/ari1021/websocket/model"
 	"github.com/ari1021/websocket/server/db"
+	"github.com/ari1021/websocket/server/validation"
 	"github.com/ari1021/websocket/server/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 func NewEcho(hub *websocket.Hub) *echo.Echo {
@@ -20,6 +20,7 @@ func NewEcho(hub *websocket.Hub) *echo.Echo {
 	db.DB.Conn = conn
 
 	e := echo.New()
+	e = validation.ValidateEcho(e)
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
@@ -28,7 +29,6 @@ func NewEcho(hub *websocket.Hub) *echo.Echo {
 	e.File("/chat", "./view/chat.html")
 
 	e.GET("/ws/:id", controller.ServeRoomWs)
-	e.Validator = &customValidator{Validator: validator.New()}
 	rr := model.NewRoomRepository(conn)
 	rh := controller.NewRoomHandler(rr)
 	e.GET("/rooms", rh.GetRooms)

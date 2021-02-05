@@ -10,6 +10,7 @@ import (
 
 	"github.com/ari1021/websocket/model"
 	"github.com/ari1021/websocket/model/mock_model"
+	"github.com/ari1021/websocket/server/validation"
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -18,6 +19,7 @@ import (
 
 func TestRoomHandler_CreateRoom(t *testing.T) {
 	e := echo.New()
+	e = validation.ValidateEcho(e)
 	f := make(url.Values)
 	f.Set("name", "test")
 	req := httptest.NewRequest(http.MethodPost, "/rooms", strings.NewReader(f.Encode()))
