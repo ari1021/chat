@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -18,6 +20,15 @@ import (
 )
 
 func TestRoomHandler_CreateRoom(t *testing.T) {
+	expected := &model.Room{
+		Model: gorm.Model{
+			ID:        1,
+			CreatedAt: time.Time{},
+			UpdatedAt: time.Time{},
+			DeletedAt: gorm.DeletedAt{},
+		},
+		Name: "test",
+	}
 	e := echo.New()
 	e = validation.ValidateEcho(e)
 	f := make(url.Values)
@@ -32,19 +43,20 @@ func TestRoomHandler_CreateRoom(t *testing.T) {
 	defer ctrl.Finish()
 
 	roomMock := mock_model.NewMockIRoom(ctrl)
-	roomMock.EXPECT().Create("test").Return(&model.Room{
-		Model: gorm.Model{
-			ID:        1,
-			CreatedAt: time.Time{},
-			UpdatedAt: time.Time{},
-			DeletedAt: gorm.DeletedAt{},
-		},
-		Name: "test",
-	}, nil)
+	roomMock.EXPECT().Create("test").Return(expected, nil)
 	rh := RoomHandler{
 		IRoom: roomMock,
 	}
-	if assert.NoError(t, rh.CreateRoom(c)) {
-		assert.Equal(t, http.StatusOK, rec.Code)
+
+	err := rh.CreateRoom(c)
+	// error確認
+	assert.NoError(t, err)
+	// statusCode確認
+	assert.Equal(t, http.StatusOK, rec.Code)
+	// response確認
+	got := &model.Room{}
+	if err := json.Unmarshal(rec.Body.Bytes(), got); err != nil {
+		log.Fatal(err)
 	}
+	assert.Equal(t, expected, got)
 }
