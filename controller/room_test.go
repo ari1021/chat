@@ -60,3 +60,53 @@ func TestRoomHandler_CreateRoom(t *testing.T) {
 	}
 	assert.Equal(t, expected, got)
 }
+
+func TestRoomHandler_GetRooms(t *testing.T) {
+	expected := &model.Rooms{
+		model.Room{
+			Model: gorm.Model{
+				ID:        1,
+				CreatedAt: time.Time{},
+				UpdatedAt: time.Time{},
+				DeletedAt: gorm.DeletedAt{},
+			},
+			Name: "test",
+		},
+		model.Room{
+			Model: gorm.Model{
+				ID:        2,
+				CreatedAt: time.Time{},
+				UpdatedAt: time.Time{},
+				DeletedAt: gorm.DeletedAt{},
+			},
+			Name: "test",
+		},
+	}
+	e := echo.New()
+	e = validation.ValidateEcho(e)
+	req := httptest.NewRequest(http.MethodGet, "/rooms", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	// mockの準備
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	roomMock := mock_model.NewMockIRoom(ctrl)
+	roomMock.EXPECT().FindAll().Return(expected, nil)
+	rh := RoomHandler{
+		IRoom: roomMock,
+	}
+
+	err := rh.GetRooms(c)
+	// error確認
+	assert.NoError(t, err)
+	// statusCode確認
+	assert.Equal(t, http.StatusOK, rec.Code)
+	// response確認
+	got := &model.Rooms{}
+	if err := json.Unmarshal(rec.Body.Bytes(), got); err != nil {
+		log.Fatal(err)
+	}
+	assert.Equal(t, expected, got)
+}
