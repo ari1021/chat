@@ -13,6 +13,12 @@ import (
 )
 
 func NewEcho(hub *websocket.Hub) *echo.Echo {
+	conn, err := db.NewConnection()
+	if err != nil {
+		log.Fatal(err)
+	}
+	db.DB.Conn = conn
+
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -23,16 +29,12 @@ func NewEcho(hub *websocket.Hub) *echo.Echo {
 
 	e.GET("/ws/:id", controller.ServeRoomWs)
 	e.Validator = &customValidator{Validator: validator.New()}
-	e.GET("/rooms", controller.GetRooms)
-	rh := controller.NewRoomHandler(db.DB, &model.Room{})
+	rr := model.NewRoomRepository(conn)
+	rh := controller.NewRoomHandler(rr)
+	e.GET("/rooms", rh.GetRooms)
 	e.POST("/rooms", rh.CreateRoom)
-	e.DELETE("/rooms/:id", controller.DeleteRoom)
+	e.DELETE("/rooms/:id", rh.DeleteRoom)
 	e.GET("/rooms/:id/chats", controller.GetChats)
 	e.POST("/rooms/:id/chats", controller.CreateChat)
-	conn, err := db.NewConnection()
-	if err != nil {
-		log.Fatal(err)
-	}
-	db.DB.Conn = conn
 	return e
 }

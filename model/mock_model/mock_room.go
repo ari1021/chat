@@ -7,7 +7,6 @@ package mock_model
 import (
 	model "github.com/ari1021/websocket/model"
 	gomock "github.com/golang/mock/gomock"
-	gorm "gorm.io/gorm"
 	reflect "reflect"
 )
 
@@ -35,46 +34,46 @@ func (m *MockIRoom) EXPECT() *MockIRoomMockRecorder {
 }
 
 // Create mocks base method
-func (m *MockIRoom) Create(conn *gorm.DB) (*model.Room, error) {
+func (m *MockIRoom) Create(name string) (*model.Room, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", conn)
+	ret := m.ctrl.Call(m, "Create", name)
 	ret0, _ := ret[0].(*model.Room)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create
-func (mr *MockIRoomMockRecorder) Create(conn interface{}) *gomock.Call {
+func (mr *MockIRoomMockRecorder) Create(name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockIRoom)(nil).Create), conn)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockIRoom)(nil).Create), name)
 }
 
 // FindAll mocks base method
-func (m *MockIRoom) FindAll(conn *gorm.DB) (*model.Rooms, error) {
+func (m *MockIRoom) FindAll() (*model.Rooms, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindAll", conn)
+	ret := m.ctrl.Call(m, "FindAll")
 	ret0, _ := ret[0].(*model.Rooms)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FindAll indicates an expected call of FindAll
-func (mr *MockIRoomMockRecorder) FindAll(conn interface{}) *gomock.Call {
+func (mr *MockIRoomMockRecorder) FindAll() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockIRoom)(nil).FindAll), conn)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockIRoom)(nil).FindAll))
 }
 
 // Delete mocks base method
-func (m *MockIRoom) Delete(conn *gorm.DB) (*model.Room, error) {
+func (m *MockIRoom) Delete(id uint) (*model.Room, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", conn)
+	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(*model.Room)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Delete indicates an expected call of Delete
-func (mr *MockIRoomMockRecorder) Delete(conn interface{}) *gomock.Call {
+func (mr *MockIRoomMockRecorder) Delete(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockIRoom)(nil).Delete), conn)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockIRoom)(nil).Delete), id)
 }

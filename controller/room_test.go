@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/ari1021/websocket/model/mock_model"
-	"github.com/ari1021/websocket/server/db"
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -30,8 +29,7 @@ func TestRoomHandler_CreateRoom(t *testing.T) {
 	roomMock := mock_model.NewMockIRoom(ctrl)
 	roomMock.EXPECT().Create(nil).Return(1)
 	rh := RoomHandler{
-		db:   db.DBConnection{Conn: nil},
-		room: roomMock,
+		IRoom: roomMock,
 	}
 	if assert.NoError(t, rh.CreateRoom(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
