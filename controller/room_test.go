@@ -215,10 +215,13 @@ func TestRoomHandler_GetRooms(t *testing.T) {
 			wantCode: http.StatusOK,
 		},
 		{
-			title: "UnknownErrorでルーム取得に失敗したときはStatusInternalServerError",
+			title: "DatabaseErrorでルーム取得に失敗したときはStatusInternalServerError",
 			name:  "test",
 			prepareRoomMock: func(rm *mock_model.MockIRoom) {
-				rm.EXPECT().FindAll().Return(nil, model.UnknownError)
+				rm.EXPECT().FindAll().Return(nil, &mysql.MySQLError{
+					Number:  1,
+					Message: "Database error",
+				})
 			},
 			want:     nil,
 			wantErr:  true,
