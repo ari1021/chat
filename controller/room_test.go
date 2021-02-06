@@ -159,53 +159,110 @@ func TestRoomHandler_CreateRoom(t *testing.T) {
 }
 
 func TestRoomHandler_GetRooms(t *testing.T) {
-	expected := &model.Rooms{
-		model.Room{
-			Model: gorm.Model{
-				ID:        1,
-				CreatedAt: time.Time{},
-				UpdatedAt: time.Time{},
-				DeletedAt: gorm.DeletedAt{},
+	tests := []struct {
+		title           string
+		name            string
+		prepareRoomMock func(*mock_model.MockIRoom)
+		want            *model.Rooms
+		wantErr         bool
+		wantCode        int
+	}{
+		{
+			title: "正しくルームを取得することができる",
+			name:  "test",
+			prepareRoomMock: func(rm *mock_model.MockIRoom) {
+				rm.EXPECT().FindAll().Return(&model.Rooms{
+					model.Room{
+						Model: gorm.Model{
+							ID:        1,
+							CreatedAt: time.Time{},
+							UpdatedAt: time.Time{},
+							DeletedAt: gorm.DeletedAt{},
+						},
+						Name: "test",
+					},
+					model.Room{
+						Model: gorm.Model{
+							ID:        2,
+							CreatedAt: time.Time{},
+							UpdatedAt: time.Time{},
+							DeletedAt: gorm.DeletedAt{},
+						},
+						Name: "test",
+					},
+				}, nil)
 			},
-			Name: "test",
-		},
-		model.Room{
-			Model: gorm.Model{
-				ID:        2,
-				CreatedAt: time.Time{},
-				UpdatedAt: time.Time{},
-				DeletedAt: gorm.DeletedAt{},
+			want: &model.Rooms{
+				model.Room{
+					Model: gorm.Model{
+						ID:        1,
+						CreatedAt: time.Time{},
+						UpdatedAt: time.Time{},
+						DeletedAt: gorm.DeletedAt{},
+					},
+					Name: "test",
+				},
+				model.Room{
+					Model: gorm.Model{
+						ID:        2,
+						CreatedAt: time.Time{},
+						UpdatedAt: time.Time{},
+						DeletedAt: gorm.DeletedAt{},
+					},
+					Name: "test",
+				},
 			},
-			Name: "test",
+			wantErr:  false,
+			wantCode: http.StatusOK,
+		},
+		{
+			title: "UnknownErrorでルーム取得に失敗したときはStatusInternalServerError",
+			name:  "test",
+			prepareRoomMock: func(rm *mock_model.MockIRoom) {
+				rm.EXPECT().FindAll().Return(nil, model.UnknownError)
+			},
+			want:     nil,
+			wantErr:  true,
+			wantCode: http.StatusInternalServerError,
 		},
 	}
-	e := echo.New()
-	e = validation.ValidateEcho(e)
-	req := httptest.NewRequest(http.MethodGet, "/rooms", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
+	for _, tt := range tests {
+		t.Run(tt.title, func(t *testing.T) {
+			e := echo.New()
+			e = validation.ValidateEcho(e)
+			req := httptest.NewRequest(http.MethodGet, "/rooms", nil)
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+			// mockの準備
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 
-	// mockの準備
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+			rm := mock_model.NewMockIRoom(ctrl)
+			tt.prepareRoomMock(rm)
+			rh := RoomHandler{
+				IRoom: rm,
+			}
 
-	roomMock := mock_model.NewMockIRoom(ctrl)
-	roomMock.EXPECT().FindAll().Return(expected, nil)
-	rh := RoomHandler{
-		IRoom: roomMock,
+			// エラーチェック
+			if err := rh.GetRooms(c); err != nil {
+				t.Errorf("GetRooms() err = %v, want = %v", err, nil)
+			}
+			// ステータスコードのチェック
+			if rec.Code != tt.wantCode {
+				t.Errorf("GetRooms() code = %d, want = %d", rec.Code, tt.wantCode)
+			}
+			// 返り値の中身チャック
+			if !tt.wantErr {
+				got := &model.Rooms{}
+				if err := json.Unmarshal(rec.Body.Bytes(), got); err != nil {
+					log.Fatal(err)
+				}
+				if !cmp.Equal(got, tt.want) {
+					t.Errorf("GetRooms() diff = %v", cmp.Diff(got, tt.want))
+				}
+			}
+		})
 	}
-
-	err := rh.GetRooms(c)
-	// error確認
-	assert.NoError(t, err)
-	// statusCode確認
-	assert.Equal(t, http.StatusOK, rec.Code)
-	// response確認
-	got := &model.Rooms{}
-	if err := json.Unmarshal(rec.Body.Bytes(), got); err != nil {
-		log.Fatal(err)
-	}
-	assert.Equal(t, expected, got)
 }
 
 func TestRoomHandler_DeleteRoom(t *testing.T) {
