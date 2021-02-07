@@ -13,6 +13,11 @@ type IChat interface {
 type ChatRepository struct {
 	conn *gorm.DB
 }
+
+func NewChatRepository(conn *gorm.DB) *ChatRepository {
+	return &ChatRepository{conn: conn}
+}
+
 type Chat struct {
 	ID        int       `gorm:"primaryKey"`
 	CreatedAt time.Time `gorm:"index"`
