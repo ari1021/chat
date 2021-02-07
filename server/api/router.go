@@ -34,7 +34,9 @@ func NewEcho(hub *websocket.Hub) *echo.Echo {
 	e.GET("/rooms", rh.GetRooms)
 	e.POST("/rooms", rh.CreateRoom)
 	e.DELETE("/rooms/:id", rh.DeleteRoom)
-	e.GET("/rooms/:id/chats", controller.GetChats)
-	e.POST("/rooms/:id/chats", controller.CreateChat)
+	cr := model.NewChatRepository(conn)
+	ch := controller.NewChatHandler(cr)
+	e.GET("/rooms/:id/chats", ch.GetChats)
+	e.POST("/rooms/:id/chats", ch.CreateChat)
 	return e
 }
