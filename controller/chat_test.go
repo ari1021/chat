@@ -165,3 +165,157 @@ func TestChatHandler_CreateChat(t *testing.T) {
 		})
 	}
 }
+
+func TestChatHandler_GetChats(t *testing.T) {
+	tests := []struct {
+		title           string
+		id              string
+		limit           string
+		offset          string
+		wantMock        bool
+		prepareChatMock func(*mock_model.MockIChat)
+		want            *model.Chats
+		wantErr         bool
+		wantCode        int
+	}{
+		{
+			title:    "正しくメッセージを取得できる",
+			id:       "1",
+			limit:    "2",
+			offset:   "0",
+			wantMock: true,
+			prepareChatMock: func(cm *mock_model.MockIChat) {
+				cm.EXPECT().Find(1, 2, 0).Return(&model.Chats{
+					model.Chat{
+						ID:        1,
+						CreatedAt: time.Time{},
+						RoomID:    1,
+						Room:      model.Room{},
+						Message:   "test",
+						UserName:  "test",
+					},
+					model.Chat{
+						ID:        2,
+						CreatedAt: time.Time{},
+						RoomID:    1,
+						Room:      model.Room{},
+						Message:   "test",
+						UserName:  "test",
+					},
+				}, nil)
+			},
+			want: &model.Chats{
+				model.Chat{
+					ID:        1,
+					CreatedAt: time.Time{},
+					RoomID:    1,
+					Room:      model.Room{},
+					Message:   "test",
+					UserName:  "test",
+				},
+				model.Chat{
+					ID:        2,
+					CreatedAt: time.Time{},
+					RoomID:    1,
+					Room:      model.Room{},
+					Message:   "test",
+					UserName:  "test",
+				},
+			},
+			wantErr:  false,
+			wantCode: http.StatusOK,
+		},
+		{
+			title:           "limitのvalidationに失敗したときはStatusBadRequest",
+			id:              "1",
+			limit:           "",
+			offset:          "0",
+			wantMock:        false,
+			prepareChatMock: nil,
+			want:            nil,
+			wantErr:         true,
+			wantCode:        http.StatusBadRequest,
+		},
+		{
+			title:    "DatabaseErrorでメッセージ取得に失敗したときはStatusInternalServerError",
+			id:       "1",
+			limit:    "2",
+			offset:   "0",
+			wantMock: true,
+			prepareChatMock: func(cm *mock_model.MockIChat) {
+				cm.EXPECT().Find(1, 2, 0).Return(nil, &mysql.MySQLError{
+					Number:  1,
+					Message: "database error",
+				})
+			},
+			want:     nil,
+			wantErr:  true,
+			wantCode: http.StatusInternalServerError,
+		},
+		// {
+		// 	title:           "offsetのvalidationに失敗したときはStatusBadRequest",
+		// 	id:              "1",
+		// 	limit:           "2",
+		// 	offset:          "",
+		// 	wantMock:        false,
+		// 	prepareChatMock: nil,
+		// 	want:            nil,
+		// 	wantErr:         true,
+		// 	wantCode:        http.StatusBadRequest,
+		// },
+	}
+	for _, tt := range tests {
+		t.Run(tt.title, func(t *testing.T) {
+			e := echo.New()
+			// validatorの設定
+			e = validation.ValidateEcho(e)
+			// queryparamの設定
+			q := make(url.Values)
+			q.Set("limit", tt.limit)
+			q.Set("offset", tt.offset)
+			req := httptest.NewRequest(http.MethodPost, "/rooms/:id/chats?"+q.Encode(), nil)
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+			// pathparamの設定
+			c.SetPath("/rooms/:id/chats")
+			c.SetParamNames("id")
+			c.SetParamValues(tt.id)
+
+			var ch ChatHandler
+			if tt.wantMock {
+				// mockの準備
+				ctrl := gomock.NewController(t)
+				defer ctrl.Finish()
+
+				cm := mock_model.NewMockIChat(ctrl)
+				// return値の設定
+				tt.prepareChatMock(cm)
+				ch = ChatHandler{
+					IChat: cm,
+				}
+			} else {
+				ch = ChatHandler{nil}
+			}
+
+			// エラーチェック
+			if err := ch.GetChats(c); err != nil {
+				t.Errorf("GetChats() err = %v, want = %v", err, nil)
+			}
+			// ステータスコードのチェック
+			if rec.Code != tt.wantCode {
+				t.Errorf("GetChats() code = %d, want = %d", rec.Code, tt.wantCode)
+			}
+			// 返り値の中身チャック
+			if !tt.wantErr {
+				got := &model.Chats{}
+				if err := json.Unmarshal(rec.Body.Bytes(), got); err != nil {
+					log.Fatal(err)
+				}
+				if !cmp.Equal(got, tt.want) {
+					t.Errorf("GetChats() diff = %v", cmp.Diff(got, tt.want))
+				}
+			}
+		})
+	}
+}
