@@ -9,6 +9,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type ChatHandler struct {
+	IChat model.IChat
+}
+
+func NewChatHandler(IChat model.IChat) ChatHandler {
+	return ChatHandler{
+		IChat: IChat,
+	}
+}
+
 func CreateChat(c echo.Context) error {
 	req := &request.CreateChat{}
 	if err := c.Bind(req); err != nil {
