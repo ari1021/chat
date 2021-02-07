@@ -6,6 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
+type IChat interface {
+	Find(roomID int, limit int, offset int) (*Chats, error)
+	Create(message string, roomID int, userName string) (*Chat, error)
+}
 type ChatRepository struct {
 	conn *gorm.DB
 }
