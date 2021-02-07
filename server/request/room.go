@@ -5,5 +5,5 @@ type CreateRoom struct {
 }
 
 type DeleteRoom struct {
-	ID int `param:"id"`
+	ID uint `param:"id"`
 }
