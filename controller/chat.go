@@ -42,7 +42,7 @@ func (ch ChatHandler) GetChats(c echo.Context) error {
 		return err
 	}
 	if err := c.Validate(req); err != nil {
-		res := model.NewAPIError(400, "limit or offset not found")
+		res := model.NewAPIError(400, "limit not found")
 		return c.JSON(http.StatusBadRequest, res)
 	}
 	ic := ch.IChat

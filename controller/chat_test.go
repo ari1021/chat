@@ -252,17 +252,6 @@ func TestChatHandler_GetChats(t *testing.T) {
 			wantErr:  true,
 			wantCode: http.StatusInternalServerError,
 		},
-		// {
-		// 	title:           "offsetのvalidationに失敗したときはStatusBadRequest",
-		// 	id:              "1",
-		// 	limit:           "2",
-		// 	offset:          "",
-		// 	wantMock:        false,
-		// 	prepareChatMock: nil,
-		// 	want:            nil,
-		// 	wantErr:         true,
-		// 	wantCode:        http.StatusBadRequest,
-		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.title, func(t *testing.T) {
