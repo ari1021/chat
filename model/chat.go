@@ -6,6 +6,18 @@ import (
 	"gorm.io/gorm"
 )
 
+type IChat interface {
+	Find(roomID int, limit int, offset int) (*Chats, error)
+	Create(message string, roomID int, userName string) (*Chat, error)
+}
+type ChatRepository struct {
+	conn *gorm.DB
+}
+
+func NewChatRepository(conn *gorm.DB) *ChatRepository {
+	return &ChatRepository{conn: conn}
+}
+
 type Chat struct {
 	ID        int       `gorm:"primaryKey"`
 	CreatedAt time.Time `gorm:"index"`
@@ -17,15 +29,21 @@ type Chat struct {
 
 type Chats []Chat
 
-func (c *Chats) Find(conn *gorm.DB, roomID int, limit int, offset int) (*Chats, error) {
-	if err := conn.Order("created_at desc").Limit(limit).Offset(offset).Find(c, "room_id = ?", roomID).Error; err != nil {
+func (cr ChatRepository) Find(roomID int, limit int, offset int) (*Chats, error) {
+	cs := &Chats{}
+	if err := cr.conn.Order("created_at desc").Limit(limit).Offset(offset).Find(cs, "room_id = ?", roomID).Error; err != nil {
 		return nil, err
 	}
-	return c, nil
+	return cs, nil
 }
 
-func (c *Chat) Create(conn *gorm.DB) (*Chat, error) {
-	if err := conn.Create(c).Error; err != nil {
+func (cr ChatRepository) Create(message string, roomID int, userName string) (*Chat, error) {
+	c := &Chat{
+		RoomID:   roomID,
+		Message:  message,
+		UserName: userName,
+	}
+	if err := cr.conn.Create(c).Error; err != nil {
 		return nil, err
 	}
 	return c, nil
