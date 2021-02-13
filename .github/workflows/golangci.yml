@@ -40,4 +40,4 @@ jobs:
         # -v: 実行しているコマンドを表示
         # -t: 指定されたパッケージのテストに必要なパッケージも一緒にダウンロード
       - name: Test code
-        run: go test -v ./controller
+        run: go test -v ./...
