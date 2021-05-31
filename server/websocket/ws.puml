@@ -1,0 +1,9 @@
+@startuml
+actor front as Front
+participant client_Go as Client
+participant Hub_Go as Hub
+Front -> Client : send
+Client -> Hub : ReadPump
+Hub -> Client : WritePump
+Client -> Front: send
+@enduml
